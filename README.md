@@ -7,5 +7,5 @@ Feel free to review, comment, and offer any feedback you may have!
 mistakes.many?  ? "a master programmer you will become" : "you're not programming enough"
 ````
 
-Follow me on Twitter: [@jiujitsuscott](https://twitter.com/jiuJitsuScott)  
+Follow me on Twitter: [@codeByScott](https://twitter.com/codeByScott)  
 If many mistakes makes a master programmer, phenomenal I shall be.
