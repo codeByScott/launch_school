@@ -15,14 +15,17 @@
 # #   # # #  # #    # #  #     # #   # #  #   #  #
 # ### ### ###  ###  ###  #   ### ### ###  #   #  #
 #                                                #
-#                   O   O                        #
-#                     *                          #
-# <3              "  \_/  "                   <3 #
+#                     O   O                      #
+#                       *                        #
+# <3                "  \_/  "                 <3 #
  ################################################
 
-action_movies = { "Rambo": 1982, 
-                  "Terminator": 1985, 
-                  "Die Hard": 1989,
-                  "Speed": 1994}
+action_movies = { rambo: 1982, 
+                  terminator: 1985, 
+                  die_hard: 1989,
+                  speed: 1994}
 
-puts action_movies.values
+puts action_movies[:rambo]
+puts action_movies[:terminator]
+puts action_movies[:die_hard]
+puts action_movies[:speed]
