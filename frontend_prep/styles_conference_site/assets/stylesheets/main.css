@@ -60,8 +60,9 @@ Custom Styles
 */
 
 body {
+  background: #293f50;
   color: #888;
-  font: 300 16px/22px "Open sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: 300 16px/22px "Lato", "Open sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /*
@@ -143,6 +144,7 @@ h5 {
   color: #a9b2b9;
   font-size: 14px;
   font-weight: 400;
+  text-transform: uppercase;
 }
 
 strong {
@@ -159,12 +161,17 @@ Links
 ==========================================================
 */
 
+a {
+  color: #648880;
+  text-decoration: none;
+}
+
 a:hover {
   color: #a9b2b9;
 }
 
-a {
-  color: #648880;
+p a {
+  border-bottom: 1px solid #dfe2e5;
 }
 
 /*
@@ -175,13 +182,23 @@ Buttons
 
 .btn {
   border-radius: 5px;
+  color: #fff;
+  font-weight: 400;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  cursor: pointer;
   display: inline-block;
   margin: 0;
 }
 
 .btn-alt {
-  border: 1px solid #dfe2e5;
+  border: 1px solid #fff;
   padding: 10px 30px;
+}
+
+.btn-alt:hover {
+  background: #fff;
+  color: #648880;
 }
 
 /*
@@ -191,8 +208,10 @@ Home
 */
 
 .hero {
+  color: #fff;
   line-height: 44px;
   padding: 22px 80px 66px 80px;
+  text-align: center;
 }
 
 .hero h2 {
@@ -201,6 +220,11 @@ Home
 
 .hero p {
   font-size: 24px;
+  font-weight: 100;
+}
+
+.teaser a:hover h3 {
+  color: #a9b2b9;
 }
 
 /*
@@ -234,17 +258,31 @@ Primary Header
   border-top: 4px solid #648880;
   float: left;
   font-size: 48px;
+  font-weight: 100;
+  letter-spacing: .5px;
   line-height: 44px;
   padding: 40px 0 22px 0;
+  text-transform: uppercase;
 }
 
 .tagline {
   margin: 66px 0 22px 0;
+  text-align: right;
 }
 
 .primary-nav {
   font-size: 14px;
   font-weight: 400;
+}
+
+.primary-header a,
+.primary-footer a {
+  color: #fff;
+}
+
+.primary-header a:hover,
+.primary-footer a:hover {
+  color: #648880;
 }
 
 /*
@@ -262,4 +300,27 @@ Primary Footer
 
 .primary-footer small {
   float: left;
+  font-weight: 400;
+}
+
+/*
+==========================================================
+Navigation
+==========================================================
+*/
+
+.nav {
+  text-align: right;
+}
+
+/*
+==========================================================
+Rows
+==========================================================
+*/
+
+.row {
+  background: #fff;
+  min-width: 960px;
+  padding: 66px 0 44px 0;
 }
