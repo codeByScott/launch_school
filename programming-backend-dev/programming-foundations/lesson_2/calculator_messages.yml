@@ -1,0 +1,14 @@
+# calculator_messages.yml
+
+welcome: "Hi my name is C,  what is your name?"
+valid_name: "I find it more enjoyable if we know each others names."
+greet: "Hi"
+request_number1: "What's the first number?"
+request_number2: "What's the second number?"
+invalid_number: "Hmm...don't be silly.  I can only calculate numbers."
+valid_operator: "Must choose 1, 2, 3 or 4"
+operating: " the two numbers..."
+results: "The result is: "
+continue?: "Do you want to perform another calculation? (Y to calculate again)"
+goodbye: "Thank you for using the calculator"
+goodbye2: "Good bye."
