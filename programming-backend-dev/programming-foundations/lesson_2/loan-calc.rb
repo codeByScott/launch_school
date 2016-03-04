@@ -10,9 +10,9 @@ def prompt(message)
 end
 
 puts 
-puts "-" * 50
-puts "MORTGAGE CALCULATOR".center(50)
-puts "-" * 50
+puts "-" * 65
+puts "MORTGAGE CALCULATOR".center(65)
+puts "-" * 65
 
 
 loop do # main loop
@@ -58,5 +58,7 @@ loop do # main loop
   again = gets.chomp
   break unless again.downcase.start_with?('y')
 end
+puts
+puts "** Have a fantastic day! **".center(65)
 
 
