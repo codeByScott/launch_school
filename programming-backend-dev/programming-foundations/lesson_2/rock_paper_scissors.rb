@@ -20,8 +20,9 @@ def display_results(player, computer)
   end
 end
 
+puts
 puts "-" * 75
-puts "ROCK, PAPER, SCISSORS".center(75)
+puts "ROCK, PAPER, SCISSORS".ljust(50) + "Created by CodeByScott".rjust(25)
 puts "-" * 75
 
 loop do # main loop
