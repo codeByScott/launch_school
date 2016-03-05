@@ -3,6 +3,7 @@
 
 VALID_CHOICES = %w(rock paper scissors spock lizard).freeze
 
+
 def prompt(message)
   puts "=> #{message}"
 end
@@ -29,9 +30,10 @@ def display_results(player, computer)
     "It's a tie!"
   end
 end
+  
 
-wins = losses = draws = 0
 def score_keeper(player, computer)
+  wins = losses = draws = 0
   if win_round?(player, computer)
     wins += 1
   elsif win_round?(computer, player)
@@ -39,6 +41,7 @@ def score_keeper(player, computer)
   else
     draws += 1
   end
+  "Wins: #{wins} Losses: #{losses} Draws: #{draws}"
 end
 
 puts
@@ -47,7 +50,7 @@ puts "ROCK, PAPER, SCISSORS, SPOCK, LIZARD".ljust(50) + "Created by CodeByScott"
 puts "-" * 75
 
 3.times do # main loop
-    
+
   choice = ''
   loop do
     prompt "Choose one: #{VALID_CHOICES.join(', ')}"
@@ -57,9 +60,10 @@ puts "-" * 75
   end
 
   computer_choice = VALID_CHOICES.sample
-  prompt "You chose: #{choice}, the computer chose: #{computer_choice}."
-  prompt display_results(choice, computer_choice)
-  prompt "Wins: #{wins} Losses: #{losses} Draws: #{draws}"
+  
+  prompt "#{choice.capitalize} VS #{computer_choice.capitalize}: #{display_results(choice, computer_choice)}"
+  prompt score_keeper(choice, computer_choice)
+  
 
 end
 
