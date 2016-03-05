@@ -29,18 +29,17 @@ def display_results(player, computer)
     "It's a tie!"
   end
 end
+current_score = { wins: 0, losses: 0, draws: 0 }
 
-$wins = $losses = $draws = 0
-def score_keeper(player, computer)
-  
+def score_keeper(score, player, computer)
   if win_round?(player, computer)
-    $wins += 1
+    score[:wins] += 1
   elsif win_round?(computer, player)
-    $losses += 1
+    score[:losses] += 1
   else
-    $draws += 1
+    score[:draws] += 1
   end
-  "Wins: #{$wins} Losses: #{$losses} Draws: #{$draws}"
+  "Wins: #{score[:wins]} Losses: #{score[:losses]} Draws: #{score[:draws]}"
 end
 
 puts
@@ -50,19 +49,22 @@ puts "-" * 75
 
 3.times do # main loop
 
-  choice = ''
+  user_choice = ''
   loop do
     prompt "Choose one: #{VALID_CHOICES.join(', ')}"
-    choice = gets.chomp
-    break if VALID_CHOICES.include?(choice)
+    user_choice = gets.chomp
+    break if VALID_CHOICES.include?(user_choice)
     prompt "That's not a valid choice!"
   end
 
   computer_choice = VALID_CHOICES.sample
   
-  prompt "#{choice.capitalize} VS #{computer_choice.capitalize}: #{display_results(choice, computer_choice)}"
-  prompt score_keeper(choice, computer_choice)
+  prompt "#{user_choice.capitalize} VS #{computer_choice.capitalize}: #{display_results(user_choice, computer_choice)}"
+  prompt score_keeper(current_score, user_choice, computer_choice)
   
 end
 
 prompt "Thank you for playing RPSSL!"
+
+
+# wins, losses, draws = score_keeper(wins, losses, draws)
