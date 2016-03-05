@@ -3,7 +3,6 @@
 
 VALID_CHOICES = %w(rock paper scissors spock lizard).freeze
 
-
 def prompt(message)
   puts "=> #{message}"
 end
@@ -30,18 +29,18 @@ def display_results(player, computer)
     "It's a tie!"
   end
 end
-  
 
+$wins = $losses = $draws = 0
 def score_keeper(player, computer)
-  wins = losses = draws = 0
+  
   if win_round?(player, computer)
-    wins += 1
+    $wins += 1
   elsif win_round?(computer, player)
-    losses += 1
+    $losses += 1
   else
-    draws += 1
+    $draws += 1
   end
-  "Wins: #{wins} Losses: #{losses} Draws: #{draws}"
+  "Wins: #{$wins} Losses: #{$losses} Draws: #{$draws}"
 end
 
 puts
@@ -64,7 +63,6 @@ puts "-" * 75
   prompt "#{choice.capitalize} VS #{computer_choice.capitalize}: #{display_results(choice, computer_choice)}"
   prompt score_keeper(choice, computer_choice)
   
-
 end
 
 prompt "Thank you for playing RPSSL!"
