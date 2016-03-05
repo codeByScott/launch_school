@@ -1,4 +1,4 @@
-VALID_CHOICES = ['rock', 'paper', 'scissors']
+VALID_CHOICES = %w(rock paper scissors).freeze
 
 def prompt(message)
   puts "=> #{message}"
@@ -6,12 +6,12 @@ end
 
 def display_results(player, computer)
   if player == 'rock' && computer == 'scissors' ||
-      player == 'paper' && computer == 'rock' ||
-      player == 'scissors' && computer == 'paper'
+     player == 'paper' && computer == 'rock' ||
+     player == 'scissors' && computer == 'paper'
     "You won!"
   elsif player == 'rock' && computer == 'paper' ||
-      player == 'paper' && computer == 'scissors' ||
-      player == 'scissors' && computer == 'rock'
+        player == 'paper' && computer == 'scissors' ||
+        player == 'scissors' && computer == 'rock'
     "Computer won!"
   else
     "It's a tie!"
@@ -22,7 +22,7 @@ puts "-" * 75
 puts "ROCK, PAPER, SCISSORS".center(75)
 puts "-" * 75
 
-loop do #main loop
+loop do # main loop
   choice = ''
   loop do
     prompt "Choose one: #{VALID_CHOICES.join(', ')}"
