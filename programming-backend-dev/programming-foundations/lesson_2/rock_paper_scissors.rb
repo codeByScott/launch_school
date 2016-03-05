@@ -8,13 +8,13 @@ def display_results(player, computer)
   if player == 'rock' && computer == 'scissors' ||
       player == 'paper' && computer == 'rock' ||
       player == 'scissors' && computer == 'paper'
-    prompt "You won!"
+    "You won!"
   elsif player == 'rock' && computer == 'paper' ||
       player == 'paper' && computer == 'scissors' ||
       player == 'scissors' && computer == 'rock'
-    prompt "Computer won!"
+    "Computer won!"
   else
-    prompt "It's a tie!"
+    "It's a tie!"
   end
 end
 
@@ -32,12 +32,12 @@ loop do #main loop
   end
 
   computer_choice = VALID_CHOICES.sample
-  puts "You chose: #{choice}, the computer chose: #{computer_choice}."
-  display_results(choice, computer_choice)
+  prompt "You chose: #{choice}, the computer chose: #{computer_choice}."
+  prompt display_results(choice, computer_choice)
 
   puts "Do you want to play again? ('Y' or 'N')"
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end
 
-puts "Thank you for playing!"
+prompt "Thank you for playing!"
