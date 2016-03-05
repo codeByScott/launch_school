@@ -5,12 +5,12 @@ def prompt(message)
 end
 
 def display_results(player, computer)
-  if player == 'rock' && computer == 'scissors' ||
-     player == 'paper' && computer == 'rock' ||
+  if player == 'rock'     && computer == 'scissors' ||
+     player == 'paper'    && computer == 'rock'     ||
      player == 'scissors' && computer == 'paper'
     "You won!"
-  elsif player == 'rock' && computer == 'paper' ||
-        player == 'paper' && computer == 'scissors' ||
+  elsif player == 'rock'     && computer == 'paper'    ||
+        player == 'paper'    && computer == 'scissors' ||
         player == 'scissors' && computer == 'rock'
     "Computer won!"
   else
