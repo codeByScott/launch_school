@@ -29,8 +29,8 @@ def display_results(player, computer)
     "It's a tie!"
   end
 end
-current_score = { wins: 0, losses: 0, draws: 0 }
 
+current_score = { wins: 0, losses: 0, draws: 0 }
 def score_keeper(score, player, computer)
   if win_round?(player, computer)
     score[:wins] += 1
@@ -42,7 +42,7 @@ def score_keeper(score, player, computer)
 end
 
 def display_score(score)
- "Wins: #{score[:wins]} Losses: #{score[:losses]} Draws: #{score[:draws]}"
+  "Wins: #{score[:wins]} Losses: #{score[:losses]} Draws: #{score[:draws]}"
 end
 
 def display_winner(score)
@@ -56,7 +56,7 @@ puts "-" * 75
 puts
 prompt "First to five wins"
 
-until current_score[:wins] == 5 || current_score[:losses] == 5 do # main loop
+until current_score[:wins] == 5 || current_score[:losses] == 2 do # main loop
 
   user_choice = ''
   loop do
@@ -67,11 +67,14 @@ until current_score[:wins] == 5 || current_score[:losses] == 5 do # main loop
   end
 
   computer_choice = VALID_CHOICES.sample
-  
+
   prompt "#{user_choice.capitalize} VS #{computer_choice.capitalize}: #{display_results(user_choice, computer_choice)}"
   score_keeper(current_score, user_choice, computer_choice)
   prompt display_score(current_score)
-  
+
 end
-prompt display_winner(current_score)
-prompt "Thank you for playing RPSSL!"
+puts
+puts "-" * 75
+puts display_winner(current_score).center(75)
+puts "-" * 75
+puts "Thanks for playing!".ljust(35) + "RPSSL originally created by Sam Kass".rjust(40)
