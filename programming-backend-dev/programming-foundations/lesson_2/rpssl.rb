@@ -39,7 +39,10 @@ def score_keeper(score, player, computer)
   else
     score[:draws] += 1
   end
-  "Wins: #{score[:wins]} Losses: #{score[:losses]} Draws: #{score[:draws]}"
+end
+
+def display_score(score)
+ "Wins: #{score[:wins]} Losses: #{score[:losses]} Draws: #{score[:draws]}"
 end
 
 puts
@@ -60,7 +63,8 @@ puts "-" * 75
   computer_choice = VALID_CHOICES.sample
   
   prompt "#{user_choice.capitalize} VS #{computer_choice.capitalize}: #{display_results(user_choice, computer_choice)}"
-  prompt score_keeper(current_score, user_choice, computer_choice)
+  score_keeper(current_score, user_choice, computer_choice)
+  prompt display_score(current_score)
   
 end
 
