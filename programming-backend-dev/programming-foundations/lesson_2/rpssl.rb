@@ -22,9 +22,9 @@ end
 
 def display_results(player, computer)
   if win_round?(player, computer)
-    "You won!"
+    "You won the round!"
   elsif win_round?(computer, player)
-    "Computer won!"
+    "You lost this round!"
   else
     "It's a tie!"
   end
@@ -45,12 +45,18 @@ def display_score(score)
  "Wins: #{score[:wins]} Losses: #{score[:losses]} Draws: #{score[:draws]}"
 end
 
+def display_winner(score)
+  score[:wins] == 5 ? "You WON the game!" : "You LOST the game"
+end
+
 puts
 puts "-" * 75
 puts "ROCK, PAPER, SCISSORS, SPOCK, LIZARD".ljust(50) + "Created by CodeByScott".rjust(25)
 puts "-" * 75
+puts
+prompt "First to five wins"
 
-3.times do # main loop
+until current_score[:wins] == 5 || current_score[:losses] == 5 do # main loop
 
   user_choice = ''
   loop do
@@ -67,8 +73,5 @@ puts "-" * 75
   prompt display_score(current_score)
   
 end
-
+prompt display_winner(current_score)
 prompt "Thank you for playing RPSSL!"
-
-
-# wins, losses, draws = score_keeper(wins, losses, draws)
