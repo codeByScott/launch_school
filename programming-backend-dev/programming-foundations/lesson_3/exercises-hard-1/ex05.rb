@@ -17,9 +17,11 @@ end
 
 def dot_seperated_ip_address?(input_string)
   dot_seperated_words = input_string.split(".")
-  while dot_seperated_words.size > 0 && dot_seperated_words < 5  do
+  return false unless dot_seperated_words.size == 4
+  
+  while dot_seperated_words.size > 0 do
     word = dot_seperated_words.pop
-    break if !is_a_number?(word)
+    return false unless is_a_number?(word)
   end
   true
 end
