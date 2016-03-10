@@ -79,42 +79,45 @@ def board_full?(brd)
   empty_square?(brd).empty?
 end
 
-def play(brd)
+def play
   loop do
-    display_board(brd) = brd
-    loop do
-      display_board(brd)
-      
-      user_input!(brd)
-      break if winner?(brd) || board_full?(brd)
-      
-      computer_input!(brd)
-      break if winner?(brd) || board_full?(brd)
+    board = initialize_board
+      loop do
+        display_board(board)
+
+        user_input!(board)
+        break if winner?(board) || board_full?(board)
+
+        computer_input!(board)
+        break if winner?(board) || board_full?(board)
+      end
+
+    display_board(board)
+
+    if winner?(board)
+      system "say #{detect_winner(board)} this time!"
+      prompt "#{detect_winner(board)} this time!"
+      else
+        system "say It is a tie!" 
+        prompt "It's a tie!"
+      end
+
+      system "say Would you like to play again?"
+      prompt "Play again? ('Y' or 'N')"
+      answer = gets.chomp
+      break unless answer.downcase.start_with?('y')
     end
-
-    display_board(brd)
-
-    if winner?(brd)
-      system "say #{detect_winner(brd)} this time!"
-      prompt "#{detect_winner(brd)} this time!"
-    else
-      system "say It is a tie!" 
-      prompt "It's a tie!"
-    end
-
-    system "say Would you like to play again?"
-    prompt "Play again? ('Y' or 'N')"
-    answer = gets.chomp
-    break unless answer.downcase.start_with?('y')
-  end
-  system "say Thanks for playing!"
-  prompt "Have a good day!"
+    system "say Thanks for playing!"
+    prompt "Have a good day!"
 end
 
+system "clear"
 puts "How would you like me to address you?"
 name = gets.chomp
+system 'clear'
 welcome_message(name)
+play
 
-board = initialize_board
-play(board)
+
+
 
