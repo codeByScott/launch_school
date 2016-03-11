@@ -11,6 +11,11 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
+def joinor(array, delimeter=", ", conjunction="or")
+  array[-1] = "#{conjunction} #{array.last}" if array.size > 1
+  array.join(delimeter)
+end
+
 name = ' '
 def ask_name(name)
   puts "How would you like me to address you?"
@@ -22,7 +27,7 @@ def welcome_message(name)
   puts "*" * 50
   puts "Tic Tac Toe".ljust(25) + "A Game by codeByScott".rjust(25)
   puts "*" * 50
-  system "say Hello #{name}, I am happy to play Tic Tac Toe with you."
+  #system "say Hello #{name}, I am happy to play Tic Tac Toe with you."
   prompt "You are #{PLAYER_MARKER}.  I am #{COMPUTER_MARKER}."
 end
 
@@ -48,7 +53,7 @@ end
 def user_input!(brd)
   square = ''
   loop do
-    prompt "Choose a square (1-9):"
+    prompt "Choose a square (#{joinor(empty_square?(brd))}):"
     square = gets.chomp.to_i
     break if empty_square?(brd).include?(square)
     prompt "Sorry, that isn't a valid choice!"
@@ -99,27 +104,48 @@ def turns(brd)
   end
 end
 
-def play
-  loop do
-    board = initialize_board
-    turns(board)
-    display_board(board)
 
-    if winner?(board)
-      system "say #{detect_winner(board)} this time!"
-      prompt "#{detect_winner(board)} this time!"
-    else
-      system "say It is a tie!"
-      prompt "It's a tie!"
-    end
-    break unless play_again?
+def score_keeper(brd, score)
+  if detect_winner(brd) == 'You beat me'
+    score[:wins] += 1
+  elsif detect_winner(brd) == 'I beat you'
+    score[:losses] += 1
+  elsif board_full?(brd)
+    score[:draws] += 1
   end
-  system "say Thanks for playing!"
-  prompt "Have a good day!"
 end
+
+def display_score(score)
+  "Wins: #{score[:wins]} Losses: #{score[:losses]} Draws: #{score[:draws]}"
+end
+
+def display_winner(score)
+  score[:wins] > score[:losses] ? "You WON the game!" : "You LOST the game!"
+end
+
+# GAME PLAY
 
 system "clear"
 ask_name(name)
 system 'clear'
 welcome_message(name)
-play
+current_score = { wins: 0, losses: 0, draws: 0 }
+
+until current_score[:wins] == 1 || current_score[:losses] == 1
+  board = initialize_board
+  turns(board)
+  display_board(board)
+
+  if winner?(board)
+    #system "say #{detect_winner(board)} this time!"
+    prompt "#{detect_winner(board)} this time!"
+  else
+    #system "say It is a tie!"
+    prompt "It's a tie!"
+  end
+  score_keeper(board, current_score)
+  prompt display_score(current_score)
+end
+  #system "say Thanks for playing!"
+  prompt display_winner(current_score)
+  prompt "Have a good day!"
