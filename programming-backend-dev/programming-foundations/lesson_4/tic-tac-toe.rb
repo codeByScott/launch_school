@@ -1,4 +1,6 @@
 # tic-tac-toe.rb
+require 'pry'
+
 
 INITIAL_MARKER = ' '.freeze
 PLAYER_MARKER = "X".freeze
@@ -61,8 +63,24 @@ def user_input!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def defensive_ai(brd, line)
+  if brd.values_at(*line).count(PLAYER_MARKER) == 2
+    brd.select{ |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+  else
+    nil
+  end  
+end
+
 def computer_input!(brd)
-  square = empty_square?(brd).sample
+  square = nil
+  WINNING_COMBINATIONS.each do |line|
+    square = defensive_ai(brd, line)
+    break if square
+  end
+  
+  if !square
+    square = empty_square?(brd).sample
+  end
   brd[square] = COMPUTER_MARKER
 end
 
@@ -104,7 +122,6 @@ def turns(brd)
   end
 end
 
-
 def score_keeper(brd, score)
   if detect_winner(brd) == 'You beat me'
     score[:wins] += 1
@@ -124,14 +141,13 @@ def display_winner(score)
 end
 
 # GAME PLAY
-
 system "clear"
 ask_name(name)
 system 'clear'
 welcome_message(name)
 current_score = { wins: 0, losses: 0, draws: 0 }
 
-until current_score[:wins] == 1 || current_score[:losses] == 1
+until current_score[:wins] == 3 || current_score[:losses] == 3
   board = initialize_board
   turns(board)
   display_board(board)
