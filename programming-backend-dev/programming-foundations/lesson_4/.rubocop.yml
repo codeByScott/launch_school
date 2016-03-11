@@ -148,3 +148,6 @@ Style/SpaceAroundEqualsInParameterDefault:
 Metrics/MethodLength:
   CountComments: false  # count full line comments?
   Max: 15
+  
+Style/FileName:
+  Enabled: false
