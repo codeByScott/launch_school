@@ -15,7 +15,6 @@ def clear
   system "clear"
 end
 
-
 def joinor(array, delimeter=", ", conjunction="or")
   array[-1] = "#{conjunction} #{array.last}" if array.size > 1
   array.join(delimeter)
@@ -32,7 +31,7 @@ def welcome_message(name)
   puts "*" * 50
   puts "Tic Tac Toe".ljust(25) + "A Game by codeByScott".rjust(25)
   puts "*" * 50
-  #system "say Hello #{name}, I am happy to play Tic Tac Toe with you."
+  system "say Hello #{name}, I am happy to play Tic Tac Toe with you."
   prompt "You are #{PLAYER_MARKER}.  I am #{COMPUTER_MARKER}."
 end
 
@@ -69,32 +68,24 @@ end
 def aggressive_ai(brd, line, marker)
   if brd.values_at(*line).count(marker) == 2
     brd.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
-  
   elsif brd.values_at(*line).count(marker) == 2
-    brd.select{ |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first    
-  
-  else
-    nil
+    brd.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
   end
 end
 
 def defensive_ai(brd, line)
   if brd.values_at(*line).count(PLAYER_MARKER) == 2
-    brd.select{ |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
-  else
-    nil
-  end  
+    brd.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+  end
 end
 
 def computer_input!(brd)
   square = nil
-  
   # Offense
   WINNING_COMBINATIONS.each do |line|
     square = aggressive_ai(brd, line, COMPUTER_MARKER)
     break if square
   end
-  
   # defense
   if !square
     WINNING_COMBINATIONS.each do |line|
@@ -102,18 +93,17 @@ def computer_input!(brd)
       break if square
     end
   end
-    
-  # other selection
+  # other strategy
   if !square
-    if brd[5] == INITIAL_MARKER
-      square = 5
-    else
-      square = empty_square?(brd).sample
-    end
-   end
-   brd[square] = COMPUTER_MARKER
+    square = if brd[5] == INITIAL_MARKER
+               5
+             else
+               empty_square?(brd).sample
+             end
+  end
+  brd[square] = COMPUTER_MARKER
 end
-    
+
 def winner?(brd)
   !!detect_winner(brd)
 end
@@ -135,10 +125,10 @@ end
 
 def announce_round_winner(brd)
   if winner?(brd)
-    #system "say #{detect_winner(board)} this time!"
+    system "say #{detect_winner(board)} this time!"
     prompt "#{detect_winner(brd)} this time!"
   else
-    #system "say It is a tie!"
+    system "say It is a tie!"
     prompt "It's a tie!"
   end
 end
@@ -191,13 +181,12 @@ until current_score[:wins] == 3 || current_score[:losses] == 3
   board = initialize_board
   turns(board)
   display_board(board)
-  if current_score[:wins] == 3 || current_score[:losses] == 3  
+  if current_score[:wins] == 3 || current_score[:losses] == 3
     announce_round_winner(board)
   end
-  
   score_keeper(board, current_score)
   prompt display_score(current_score)
 end
-  #system "say Thanks for playing!"
-  prompt display_winner(current_score)
-  prompt "Have a good day!"
+system "say Thanks for playing!"
+prompt display_winner(current_score)
+prompt "Have a good day!"
