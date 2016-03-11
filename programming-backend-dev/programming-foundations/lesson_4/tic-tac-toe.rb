@@ -63,6 +63,16 @@ def user_input!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def aggressive_ai(brd, line)
+  if brd.values_at(*line).count(COMPUTER_MARKER) == 2
+    brd.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+  elsif brd.values_at(*line).count(PLAYER_MARKER) == 2
+    brd.select{ |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+  else
+    nil
+  end
+end
+
 def defensive_ai(brd, line)
   if brd.values_at(*line).count(PLAYER_MARKER) == 2
     brd.select{ |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
@@ -74,7 +84,7 @@ end
 def computer_input!(brd)
   square = nil
   WINNING_COMBINATIONS.each do |line|
-    square = defensive_ai(brd, line)
+    square = aggressive_ai(brd, line)
     break if square
   end
   
