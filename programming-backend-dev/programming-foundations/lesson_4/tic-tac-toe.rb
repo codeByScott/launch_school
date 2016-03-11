@@ -1,6 +1,4 @@
 # tic-tac-toe.rb
-require 'pry'
-
 
 INITIAL_MARKER = ' '.freeze
 PLAYER_MARKER = "X".freeze
@@ -12,6 +10,11 @@ WINNING_COMBINATIONS = [[1, 2, 3], [4, 5, 6], [7, 8, 9], # rows
 def prompt(msg)
   puts "=> #{msg}"
 end
+
+def clear
+  system "clear"
+end
+
 
 def joinor(array, delimeter=", ", conjunction="or")
   array[-1] = "#{conjunction} #{array.last}" if array.size > 1
@@ -63,11 +66,13 @@ def user_input!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def aggressive_ai(brd, line)
-  if brd.values_at(*line).count(COMPUTER_MARKER) == 2
+def aggressive_ai(brd, line, marker)
+  if brd.values_at(*line).count(marker) == 2
     brd.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
-  elsif brd.values_at(*line).count(PLAYER_MARKER) == 2
-    brd.select{ |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+  
+  elsif brd.values_at(*line).count(marker) == 2
+    brd.select{ |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first    
+  
   else
     nil
   end
@@ -83,17 +88,32 @@ end
 
 def computer_input!(brd)
   square = nil
+  
+  # Offense
   WINNING_COMBINATIONS.each do |line|
-    square = aggressive_ai(brd, line)
+    square = aggressive_ai(brd, line, COMPUTER_MARKER)
     break if square
   end
   
+  # defense
   if !square
-    square = empty_square?(brd).sample
+    WINNING_COMBINATIONS.each do |line|
+      square = aggressive_ai(brd, line, PLAYER_MARKER)
+      break if square
+    end
   end
-  brd[square] = COMPUTER_MARKER
+    
+  # other selection
+  if !square
+    if brd[5] == INITIAL_MARKER
+      square = 5
+    else
+      square = empty_square?(brd).sample
+    end
+   end
+   brd[square] = COMPUTER_MARKER
 end
-
+    
 def winner?(brd)
   !!detect_winner(brd)
 end
@@ -111,6 +131,16 @@ end
 
 def board_full?(brd)
   empty_square?(brd).empty?
+end
+
+def announce_round_winner(brd)
+  if winner?(brd)
+    #system "say #{detect_winner(board)} this time!"
+    prompt "#{detect_winner(brd)} this time!"
+  else
+    #system "say It is a tie!"
+    prompt "It's a tie!"
+  end
 end
 
 def play_again?
@@ -151,9 +181,9 @@ def display_winner(score)
 end
 
 # GAME PLAY
-system "clear"
+clear
 ask_name(name)
-system 'clear'
+clear
 welcome_message(name)
 current_score = { wins: 0, losses: 0, draws: 0 }
 
@@ -161,14 +191,10 @@ until current_score[:wins] == 3 || current_score[:losses] == 3
   board = initialize_board
   turns(board)
   display_board(board)
-
-  if winner?(board)
-    #system "say #{detect_winner(board)} this time!"
-    prompt "#{detect_winner(board)} this time!"
-  else
-    #system "say It is a tie!"
-    prompt "It's a tie!"
+  if current_score[:wins] == 3 || current_score[:losses] == 3  
+    announce_round_winner(board)
   end
+  
   score_keeper(board, current_score)
   prompt display_score(current_score)
 end
