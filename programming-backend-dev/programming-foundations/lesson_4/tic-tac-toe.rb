@@ -65,7 +65,7 @@ def user_input!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def aggressive_ai(brd, line, marker)
+def aggressive_ai_move(brd, line, marker)
   if brd.values_at(*line).count(marker) == 2
     brd.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
   elsif brd.values_at(*line).count(marker) == 2
@@ -73,7 +73,7 @@ def aggressive_ai(brd, line, marker)
   end
 end
 
-def defensive_ai(brd, line)
+def defensive_ai_move(brd, line)
   if brd.values_at(*line).count(PLAYER_MARKER) == 2
     brd.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
   end
@@ -83,13 +83,13 @@ def computer_input!(brd)
   square = nil
   # Offense
   WINNING_COMBINATIONS.each do |line|
-    square = aggressive_ai(brd, line, COMPUTER_MARKER)
+    square = aggressive_ai_move(brd, line, COMPUTER_MARKER)
     break if square
   end
   # defense
   if !square
     WINNING_COMBINATIONS.each do |line|
-      square = aggressive_ai(brd, line, PLAYER_MARKER)
+      square = aggressive_ai_move(brd, line, PLAYER_MARKER)
       break if square
     end
   end
