@@ -27,7 +27,7 @@ end
 
 players_hand = []
 dealers_hand = []
-def deal_cards(deck, hand)
+def deal_card(deck, hand)
   hand << deck.pop
 end
 
@@ -57,7 +57,7 @@ def players_turn!(deck, players_hand, dealers_hand)
     display_total(players_hand)
     puts "Hit or Stay?:"
     choice = gets.strip
-    choice == 'hit' ? deal_cards(deck, players_hand) : break
+    choice == 'hit' ? deal_card(deck, players_hand) : break
     show_cards(players_hand, dealers_hand)
     break if bust?(players_hand)
   end
@@ -67,7 +67,7 @@ end
 def total_of(hand)
   hand_total = 0
   hand.each do |card|
-    hand_total += card[0].to_i
+    hand_total += card_value(card[0], hand)
   end
   hand_total
 end
@@ -80,13 +80,26 @@ def initial_deal(deck, player, dealer)
   # This is done so the player gets the 1st card from the top of the deck, 
   # the dealer gets the 2nd, and so on.  Keeping it real!
   2.times do 
-    deal_cards(deck, player) 
-    deal_cards(deck, dealer)
+    deal_card(deck, player) 
+    deal_card(deck, dealer)
   end
 end
 
 def bust?(hand)
   total_of(hand) > 21
+end
+
+def card_value(card, hand)
+  if card == 'j' || card == 'q' || card == 'k' 
+    10
+  elsif card == 'a'
+    ace_value?(hand)
+  else card.to_i
+  end
+end
+
+def ace_value?(hand)
+  total_of(hand) > 10 ? 1 : 11
 end
 
 # GAME PLAY
