@@ -21,21 +21,17 @@ deck_of_cards = [ ['2', 'h'], ['3', 'h'], ['4', 'h'], ['5', 'h'], ['6', 'h'], ['
                   ['2', 'd'], ['3', 'd'], ['4', 'd'], ['5', 'd'], ['6', 'd'], ['7', 'd'], ['8', 'd'], ['9', 'd'], ['10', 'd'], ['j', 'd'], ['q', 'd'], ['k', 'd'], ['a', 'd'],
                   ['2', 'c'], ['3', 'c'], ['4', 'c'], ['5', 'c'], ['6', 'c'], ['7', 'c'], ['8', 'c'], ['9', 'c'], ['10', 'c'], ['j', 'c'], ['q', 'c'], ['k', 'c'], ['a', 'c']]
 
-def shuffle_cards(cards)
-  cards.shuffle!
+def shuffle!(deck)
+  deck.shuffle!
 end
 
 players_hand = []
 dealers_hand = []
-def deal_initial_cards(deck, player, dealer)
-  2.times do
-    player << deck.pop  
-    dealer << deck.pop
-  end
+def deal_cards(deck, hand)
+  hand << deck.pop
 end
 
 def show_cards(players_hand, dealers_hand)
-  
   puts "Dealer shows:"
   puts
   puts ".---."
@@ -58,9 +54,10 @@ end
 def players_turn!(deck, players_hand, dealers_hand)
   choice = nil
   loop do
+    display_total(players_hand)
     puts "Hit or Stay?:"
     choice = gets.strip
-    choice == 'hit' ? deal_additional_cards(deck, players_hand) : break
+    choice == 'hit' ? deal_cards(deck, players_hand) : break
     show_cards(players_hand, dealers_hand)
   end
   show_cards(players_hand, dealers_hand)
@@ -69,19 +66,28 @@ end
 def total_of(hand)
   hand_total = 0
   hand.each do |card|
-    card_total += card[0].to_i
+    hand_total += card[0].to_i
   end
   hand_total
 end
 
-def deal_additional_cards(deck, players_hand)
-  players_hand << deck.pop
+def display_total(hand)
+  puts "Hand totals: #{total_of(hand)}"
+end
+
+def initial_deal(deck, player, dealer)
+  # This is done so the player gets the 1st card from the top of the deck, 
+  # the dealer gets the 2nd, and so on.  Keeping it real!
+  2.times do 
+    deal_cards(deck, player) 
+    deal_cards(deck, dealer)
+  end
 end
 
 # GAME PLAY
 deck = deck_of_cards
-shuffle_cards(deck)
-deal_initial_cards(deck, players_hand, dealers_hand)
+shuffle!(deck)
+initial_deal(deck, players_hand, dealers_hand)
 show_cards(players_hand, dealers_hand)
 players_turn!(deck, players_hand, dealers_hand)
 # dealer_plays
