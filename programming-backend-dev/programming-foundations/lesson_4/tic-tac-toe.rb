@@ -33,13 +33,11 @@ end
 def place_token!(brd)
   loop do
     display_board(brd)
-    
     if current_player?(brd) == 'human_player'
       user_place_token!(brd)
     else
       computer_place_token!(brd)
     end
-    
     break if winner?(brd) || board_full?(brd)
   end
 end
