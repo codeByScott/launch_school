@@ -59,6 +59,7 @@ def players_turn!(deck, players_hand, dealers_hand)
     choice = gets.strip
     choice == 'hit' ? deal_cards(deck, players_hand) : break
     show_cards(players_hand, dealers_hand)
+    break if bust?(players_hand)
   end
   show_cards(players_hand, dealers_hand)
 end  
@@ -72,7 +73,7 @@ def total_of(hand)
 end
 
 def display_total(hand)
-  puts "Hand totals: #{total_of(hand)}"
+  puts "Hand total: #{total_of(hand)}"
 end
 
 def initial_deal(deck, player, dealer)
@@ -82,6 +83,10 @@ def initial_deal(deck, player, dealer)
     deal_cards(deck, player) 
     deal_cards(deck, dealer)
   end
+end
+
+def bust?(hand)
+  total_of(hand) > 21
 end
 
 # GAME PLAY
