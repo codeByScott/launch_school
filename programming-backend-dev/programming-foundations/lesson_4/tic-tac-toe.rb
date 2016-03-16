@@ -48,7 +48,7 @@ def prompt(msg)
 end
 
 def clear
-  system "clear"
+  system "clear" or system "cls"
 end
 
 def sound_alert
