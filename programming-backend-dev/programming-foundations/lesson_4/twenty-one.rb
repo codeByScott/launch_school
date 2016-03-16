@@ -9,11 +9,9 @@
 6. If dealer bust, player wins.
 7. Compare cards and declare winner.
 =end
-
-deck = [['2', 'h'], ['3', 'h'], ['4', 'h'], ['5', 'h'], ['6', 'h'], ['7', 'h'], ['8', 'h'], ['9', 'h'], ['10', 'h'], ['j', 'h'], ['q', 'h'], ['k', 'h'], ['a', 'h'],
-        ['2', 's'], ['3', 's'], ['4', 's'], ['5', 's'], ['6', 's'], ['7', 's'], ['8', 's'], ['9', 's'], ['10', 's'], ['j', 's'], ['q', 's'], ['k', 's'], ['a', 's'],
-        ['2', 'd'], ['3', 'd'], ['4', 'd'], ['5', 'd'], ['6', 'd'], ['7', 'd'], ['8', 'd'], ['9', 'd'], ['10', 'd'], ['j', 'd'], ['q', 'd'], ['k', 'd'], ['a', 'd'],
-        ['2', 'c'], ['3', 'c'], ['4', 'c'], ['5', 'c'], ['6', 'c'], ['7', 'c'], ['8', 'c'], ['9', 'c'], ['10', 'c'], ['j', 'c'], ['q', 'c'], ['k', 'c'], ['a', 'c']]
+SUITS = %w(c d h s)
+RANKS = %w(2 3 4 5 6 7 8 9 10 j q k a)
+deck = RANKS.product(SUITS)
 
 def shuffle!(deck)
   deck.shuffle!
@@ -81,9 +79,11 @@ def players_turn!(deck, players_hand, dealers_hand)
 end
 
 def dealers_turn!(deck, players_hand, dealers_hand)
-  loop do
-    break if total_of(dealers_hand) >= 17
-    deal_card(deck, dealers_hand)
+  unless bust?(players_hand) || twenty_one?(players_hand)
+    loop do
+      break if total_of(dealers_hand) >= 17
+      deal_card(deck, dealers_hand)
+    end
   end
   show_cards(players_hand, dealers_hand)
 end
@@ -150,7 +150,5 @@ shuffle!(deck)
 initial_deal(deck, players_hand, dealers_hand)
 show_initial_cards(players_hand, dealers_hand)
 players_turn!(deck, players_hand, dealers_hand)
-unless bust?(players_hand) || twenty_one?(players_hand)
-  dealers_turn!(deck, players_hand, dealers_hand)
-end
+dealers_turn!(deck, players_hand, dealers_hand)
 announce_winner(players_hand, dealers_hand)
