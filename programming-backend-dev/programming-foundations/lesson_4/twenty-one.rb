@@ -70,10 +70,10 @@ def players_turn!(deck, players_hand, dealers_hand)
   choice = nil
   loop do
     display_total(players_hand)
-    puts "Hit or Stay?:"
-    choice = gets.strip
-    choice == 'h' ? deal_card(deck, players_hand) : break
-    show_initial_cards(players_hand, dealers_hand)
+    puts "Hit or Stay? ('h' or 's'):"
+      choice = gets.strip
+      choice == 'h' ? deal_card(deck, players_hand) : break
+      show_initial_cards(players_hand, dealers_hand)
     break if bust?(players_hand) || twenty_one?(players_hand)
   end
   show_initial_cards(players_hand, dealers_hand)
