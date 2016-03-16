@@ -25,15 +25,36 @@ def deal_card(deck, hand)
   hand << deck.pop
 end
 
-def show_cards(players_hand, dealers_hand)
+def show_initial_cards(players_hand, dealers_hand)
   puts "Dealer shows:"
-  puts
   puts ".---."
   puts "|#{dealers_hand[0][0]}  |"
   puts "| #{dealers_hand[0][1]} |"
   puts "|  #{dealers_hand[0][0]}|"
   puts ".---."
   puts
+  puts "Players cards:"
+  players_hand.each do |card|
+    puts ".---. "
+    puts "|#{card[0]}  | "
+    puts "| #{card[1]} | "
+    puts "|  #{card[0]}| "
+    puts ".---. "
+    puts
+  end
+end
+
+# Had to separate initial_cards from show_cards, because I couldn't think of an easy way to only show the first dealer card.
+def show_cards(players_hand, dealers_hand)
+  puts "Dealers cards:"
+  dealers_hand.each do |card|
+    puts ".---. "
+    puts "|#{card[0]}  | "
+    puts "| #{card[1]} | "
+    puts "|  #{card[0]}| "
+    puts ".---. "
+    puts
+  end
   puts "Players cards:"
   players_hand.each do |card|
     puts ".---. "
@@ -52,16 +73,24 @@ def players_turn!(deck, players_hand, dealers_hand)
     puts "Hit or Stay?:"
     choice = gets.strip
     choice == 'h' ? deal_card(deck, players_hand) : break
-    show_cards(players_hand, dealers_hand)
+    show_initial_cards(players_hand, dealers_hand)
     break if bust?(players_hand) || twenty_one?(players_hand)
   end
-  show_cards(players_hand, dealers_hand)
+  show_initial_cards(players_hand, dealers_hand)
   display_total(players_hand)
+end
+
+def dealers_turn!(deck, players_hand, dealers_hand)
+  loop do
+    break if total_of(dealers_hand) >= 17
+    deal_card(deck, dealers_hand)
+  end
+  show_cards(players_hand, dealers_hand)
 end
 
 def total_of(hand)
   values = hand.map { |card| card[0] }
-  
+
   sum = 0
   values.each do |value|
     if value == "a"
@@ -72,7 +101,7 @@ def total_of(hand)
       sum += value.to_i
     end
   end
-  # correcting for Aces  
+  # correcting for Aces
   values.select { |value| value == "a" }.count.times do
     sum -= 10 if sum > 21
   end
@@ -103,13 +132,25 @@ def bust?(hand)
 end
 
 def twenty_one?(hand)
-  total_of(hand) == 21
+  hand.length == 2 && total_of(hand) == 21
+end
+
+def announce_winner(player, dealer)
+  if bust?(player) || !bust?(dealer) && (total_of(dealer) > total_of(player))
+    puts "House Wins"
+  elsif twenty_one?(player)
+    puts "You Win!"
+  else
+    puts "You Win!"
+  end
 end
 
 # GAME PLAY
 shuffle!(deck)
 initial_deal(deck, players_hand, dealers_hand)
-show_cards(players_hand, dealers_hand)
+show_initial_cards(players_hand, dealers_hand)
 players_turn!(deck, players_hand, dealers_hand)
-# dealer_plays
-# announce_winner
+unless bust?(players_hand) || twenty_one?(players_hand)
+  dealers_turn!(deck, players_hand, dealers_hand)
+end
+announce_winner(players_hand, dealers_hand)
