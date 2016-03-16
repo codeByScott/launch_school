@@ -51,9 +51,13 @@ def clear
   system "clear"
 end
 
+def sound_alert
+  prompt "This game has sound.  Please adjust your volume accordingly."
+end
+
 name = ' '
 def ask_name(name)
-  puts "How would you like me to address you?"
+  prompt "How would you like me to address you?"
   name << gets.chomp
 end
 
@@ -91,7 +95,7 @@ def detect_winner(brd)
 end
 
 def display_winner(score)
-  score[:wins] > score[:losses] ? "You WON the game!" : "You LOST the game!"
+  prompt score[:wins] > score[:losses] ? "You WON the game!" : "You LOST the game!"
 end
 
 def announce_round_winner(brd)
@@ -116,7 +120,7 @@ end
 
 # Game Status?
 def game_over?(current_score)
-  current_score[:wins] == 2 || current_score[:losses] == 2
+  current_score[:wins] == 5 || current_score[:losses] == 5
 end
 
 def round_over?(brd)
@@ -188,6 +192,7 @@ end
 
 # Game Play
 clear
+sound_alert
 ask_name(name)
 clear
 welcome_message(name)
@@ -203,5 +208,5 @@ until game_over?(current_score)
   prompt display_score(current_score) if round_over?(board) && !game_over?(current_score)
 end
 system "say Thanks for playing!"
-prompt display_winner(current_score)
+display_winner(current_score)
 prompt "FINAL SCORE => #{display_score(current_score)}"
