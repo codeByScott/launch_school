@@ -9,16 +9,10 @@
 6. If dealer bust, player wins.
 7. Compare cards and declare winner.
 =end
-SUITS = %w(c d h s)
-RANKS = %w(2 3 4 5 6 7 8 9 10 j q k a)
-deck = RANKS.product(SUITS)
+SUITS = %w(c d h s).freeze
+RANKS = %w(2 3 4 5 6 7 8 9 10 j q k a).freeze
+DECK = RANKS.product(SUITS)
 
-def shuffle!(deck)
-  deck.shuffle!
-end
-
-players_hand = []
-dealers_hand = []
 def deal_card(deck, hand)
   hand << deck.pop
 end
@@ -90,8 +84,8 @@ end
 
 def total_of(hand)
   values = hand.map { |card| card[0] }
-
   sum = 0
+  
   values.each do |value|
     if value == "a"
       sum += 11
@@ -101,10 +95,12 @@ def total_of(hand)
       sum += value.to_i
     end
   end
+  
   # correcting for Aces
   values.select { |value| value == "a" }.count.times do
     sum -= 10 if sum > 21
   end
+  
   sum
 end
 
@@ -146,7 +142,10 @@ def announce_winner(player, dealer)
 end
 
 # GAME PLAY
-shuffle!(deck)
+players_hand = []
+dealers_hand = []
+deck = DECK
+deck.shuffle!
 initial_deal(deck, players_hand, dealers_hand)
 show_initial_cards(players_hand, dealers_hand)
 players_turn!(deck, players_hand, dealers_hand)
