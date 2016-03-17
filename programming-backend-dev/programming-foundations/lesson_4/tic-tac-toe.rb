@@ -1,5 +1,7 @@
 # tic-tac-toe.rb
 
+require 'pry'
+
 INITIAL_TOKEN = ' '.freeze
 PLAYER_TOKEN = "X".freeze
 COMPUTER_TOKEN = "O".freeze
@@ -38,7 +40,7 @@ def place_token!(brd)
     else
       computer_place_token!(brd)
     end
-    break if winner?(brd) || board_full?(brd)
+    break if round_over?(brd)
   end
 end
 
@@ -61,11 +63,14 @@ def ask_name(name)
   name << gets.chomp
 end
 
-def welcome_message(name)
+def display_header
   puts
   puts "*" * 50
   puts "Tic Tac Toe".ljust(25) + "A Game by codeByScott".rjust(25)
   puts "*" * 50
+end
+
+def welcome_message(name)
   system "say Hello #{name}, I am happy to play Tic Tac Toe with you."
   prompt "You are #{PLAYER_TOKEN}.  I am #{COMPUTER_TOKEN}."
 end
@@ -80,7 +85,7 @@ def display_board(brd)
 end
 
 def display_score(score)
-  "Wins: #{score[:wins]} Losses: #{score[:losses]} Draws: #{score[:draws]}"
+  prompt "Wins: #{score[:wins]} Losses: #{score[:losses]} Draws: #{score[:draws]}"
 end
 
 def detect_winner(brd)
@@ -153,41 +158,53 @@ end
 # CPU AI
 def computer_place_token!(brd)
   square = nil
-  # Offense
-  WINNING_COMBINATIONS.each do |line|
-    square = aggressive_ai_move(brd, line, COMPUTER_TOKEN)
-    break if square
+  
+  square = ai_winning_move(brd, square)
+  
+  if !ai_winning_move(brd, square)
+    square = ai_defensive_move(brd, square)
   end
-  # defense
-  if !square
-    WINNING_COMBINATIONS.each do |line|
-      square = aggressive_ai_move(brd, line, PLAYER_TOKEN)
-      break if square
-    end
-  end
-  # other strategy
-  if !square
-    square = if brd[5] == INITIAL_TOKEN
-               5
-             else
-               empty_square?(brd).sample
-             end
-  end
+  
+  if !ai_defensive_move(brd, square)
+    square = ai_default_move(brd, square)
+  end 
+  
   brd[square] = COMPUTER_TOKEN
 end
 
-def aggressive_ai_move(brd, line, marker)
-  if brd.values_at(*line).count(marker) == 2
-    brd.select { |k, v| line.include?(k) && v == INITIAL_TOKEN }.keys.first
-  elsif brd.values_at(*line).count(marker) == 2
+def ai_move(brd, line, token)
+  if brd.values_at(*line).count(token) == 2
     brd.select { |k, v| line.include?(k) && v == INITIAL_TOKEN }.keys.first
   end
 end
 
-def defensive_ai_move(brd, line)
-  if brd.values_at(*line).count(PLAYER_TOKEN) == 2
-    brd.select { |k, v| line.include?(k) && v == INITIAL_TOKEN }.keys.first
+def ai_winning_move(brd, square)
+  WINNING_COMBINATIONS.each do |line|
+    square = ai_move(brd, line, COMPUTER_TOKEN)
+    break if square
   end
+  square
+end
+
+def ai_defensive_move(brd, square)
+  if !square  
+    WINNING_COMBINATIONS.each do |line|
+      square = ai_move(brd, line, PLAYER_TOKEN)
+        break if square
+      end
+  end
+  square
+end
+
+def ai_default_move(brd, square)
+  if !square
+    square = if brd[5] == INITIAL_TOKEN
+                 5
+               else
+                 empty_square?(brd).sample
+               end
+  end
+  square
 end
 
 # Game Play
@@ -201,11 +218,13 @@ current_score = { wins: 0, losses: 0, draws: 0 }
 
 until game_over?(current_score)
   board = initialize_board
+  clear
+  display_header
   place_token!(board)
   display_board(board)
   score_keeper(board, current_score)
   announce_round_winner(board) if round_over?(board) && !game_over?(current_score)
-  prompt display_score(current_score) if round_over?(board) && !game_over?(current_score)
+  display_score(current_score) if round_over?(board) && !game_over?(current_score)
 end
 system "say Thanks for playing!"
 display_winner(current_score)
