@@ -1,7 +1,5 @@
 # tic-tac-toe.rb
 
-require 'pry'
-
 INITIAL_TOKEN = ' '.freeze
 PLAYER_TOKEN = "X".freeze
 COMPUTER_TOKEN = "O".freeze
@@ -125,7 +123,7 @@ end
 
 # Game Status?
 def game_over?(current_score)
-  current_score[:wins] == 5 || current_score[:losses] == 5
+  current_score[:wins] == 2 || current_score[:losses] == 2
 end
 
 def round_over?(brd)
@@ -168,7 +166,7 @@ def computer_place_token!(brd)
   if !ai_defensive_move(brd, square)
     square = ai_default_move(brd, square)
   end 
-  
+  sleep 1
   brd[square] = COMPUTER_TOKEN
 end
 
@@ -214,18 +212,23 @@ ask_name(name)
 clear
 welcome_message(name)
 
-current_score = { wins: 0, losses: 0, draws: 0 }
 
-until game_over?(current_score)
-  board = initialize_board
-  clear
-  display_header
-  place_token!(board)
-  display_board(board)
-  score_keeper(board, current_score)
-  announce_round_winner(board) if round_over?(board) && !game_over?(current_score)
-  display_score(current_score) if round_over?(board) && !game_over?(current_score)
+loop do 
+  current_score = { wins: 0, losses: 0, draws: 0 }
+  loop do
+    board = initialize_board
+    clear
+    display_header
+    place_token!(board)
+    display_board(board)
+    score_keeper(board, current_score)
+    break if game_over?(current_score)
+    announce_round_winner(board) if round_over?(board) && !game_over?(current_score)
+    display_score(current_score) if round_over?(board) && !game_over?(current_score)
+  end
+  system "say Thanks for playing!"
+  display_winner(current_score)
+  display_score(current_score)
+  break unless play_again?
 end
-system "say Thanks for playing!"
-display_winner(current_score)
-prompt "FINAL SCORE => #{display_score(current_score)}"
+
