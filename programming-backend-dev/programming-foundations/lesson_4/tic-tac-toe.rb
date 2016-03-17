@@ -33,7 +33,7 @@ end
 def place_token!(brd)
   loop do
     display_board(brd)
-    if current_player?(brd) == 'human_player'
+    if current_player?(brd) == :player
       user_place_token!(brd)
     else
       computer_place_token!(brd)
@@ -70,7 +70,8 @@ end
 
 def welcome_message(name)
   system "say Hello #{name}, I am happy to play Tic Tac Toe with you."
-  prompt "You are #{PLAYER_TOKEN}.  I am #{COMPUTER_TOKEN}."
+  puts
+  prompt "First to five wins.  You are #{PLAYER_TOKEN}.  I am #{COMPUTER_TOKEN}."
 end
 
 def display_board(brd)
@@ -86,25 +87,17 @@ def display_score(score)
   prompt "Wins: #{score[:wins]} Losses: #{score[:losses]} Draws: #{score[:draws]}"
 end
 
-def detect_winner(brd)
-  WINNING_COMBINATIONS.each do |line|
-    if brd.values_at(*line).count(PLAYER_TOKEN) == 3
-      return 'You beat me'
-    elsif brd.values_at(*line).count(COMPUTER_TOKEN) == 3
-      return 'I beat you'
-    end
-  end
-  nil
-end
-
 def display_winner(score)
   prompt score[:wins] > score[:losses] ? "You WON the game!" : "You LOST the game!"
 end
 
 def announce_round_winner(brd)
-  if winner?(brd)
-    system "say #{detect_winner(brd)} this time!"
-    prompt "#{detect_winner(brd)} this time!"
+  if detect_winner(brd) == :player
+    system "say You won this time!"
+    prompt "You won this time!"
+  elsif detect_winner(brd) == :computer
+    system "say I won this time!"
+    prompt "I won this time!"
   else
     system "say It is a tie!"
     prompt "It's a tie!"
@@ -112,9 +105,9 @@ def announce_round_winner(brd)
 end
 
 def score_keeper(brd, score)
-  if detect_winner(brd) == 'You beat me'
+  if detect_winner(brd) == :player
     score[:wins] += 1
-  elsif detect_winner(brd) == 'I beat you'
+  elsif detect_winner(brd) == :computer
     score[:losses] += 1
   elsif board_full?(brd)
     score[:draws] += 1
@@ -122,8 +115,20 @@ def score_keeper(brd, score)
 end
 
 # Game Status?
+def detect_winner(brd)
+  WINNING_COMBINATIONS.each do |line|
+    if brd.values_at(*line).count(PLAYER_TOKEN) == 3
+      return :player
+    elsif brd.values_at(*line).count(COMPUTER_TOKEN) == 3
+      return :computer
+    end
+  end
+
+  nil
+end
+
 def game_over?(current_score)
-  current_score[:wins] == 2 || current_score[:losses] == 2
+  current_score[:wins] == 5 || current_score[:losses] == 5
 end
 
 def round_over?(brd)
@@ -138,7 +143,7 @@ def play_again?
 end
 
 def current_player?(brd)
-  brd.values.count(" ").odd? ? 'human_player' : 'cpu_player'
+  brd.values.count(" ").odd? ? :player : :computer
 end
 
 def winner?(brd)
@@ -156,16 +161,16 @@ end
 # CPU AI
 def computer_place_token!(brd)
   square = nil
-  
+
   square = ai_winning_move(brd, square)
-  
+
   if !ai_winning_move(brd, square)
     square = ai_defensive_move(brd, square)
   end
-  
+
   if !ai_defensive_move(brd, square)
     square = ai_default_move(brd, square)
-  end 
+  end
   sleep 1
   brd[square] = COMPUTER_TOKEN
 end
@@ -185,11 +190,11 @@ def ai_winning_move(brd, square)
 end
 
 def ai_defensive_move(brd, square)
-  if !square  
+  if !square
     WINNING_COMBINATIONS.each do |line|
       square = ai_move(brd, line, PLAYER_TOKEN)
-        break if square
-      end
+      break if square
+    end
   end
   square
 end
@@ -197,10 +202,10 @@ end
 def ai_default_move(brd, square)
   if !square
     square = if brd[5] == INITIAL_TOKEN
-                 5
-               else
-                 empty_square?(brd).sample
-               end
+               5
+             else
+               empty_square?(brd).sample
+             end
   end
   square
 end
@@ -209,15 +214,12 @@ end
 clear
 sound_alert
 ask_name(name)
-clear
 welcome_message(name)
 
-
-loop do 
+loop do
   current_score = { wins: 0, losses: 0, draws: 0 }
   loop do
     board = initialize_board
-    clear
     display_header
     place_token!(board)
     display_board(board)
@@ -231,4 +233,3 @@ loop do
   display_score(current_score)
   break unless play_again?
 end
-
