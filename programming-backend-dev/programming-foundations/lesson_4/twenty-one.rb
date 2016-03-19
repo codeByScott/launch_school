@@ -84,7 +84,7 @@ def show_one_card(dealer)
 end
 
 def show_all_cards(dealer)
-  puts "\nDealers:"
+  puts "\nDealer:"
   print_hand(dealer)
 end
 
@@ -105,10 +105,9 @@ end
 
 def players_turn!(deck, players_hand, dealers_hand)
   loop do
-    
     system 'clear' or system 'cls'
     show_one_card(dealers_hand)
-    
+
     show_players_cards(players_hand)
     display_total(players_hand)
     break if player_finished?(players_hand)
