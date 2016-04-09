@@ -1,0 +1,29 @@
+Part 2: Study Guide for Interview
+
+Once you receive a passing score on part 1, you can schedule an interview. Here are some tips on how to do well on the interview.
+
+Areas of Focus
+
+general programming fluency with basic Ruby
+ability to speak clearly and with precision
+Live Coding
+
+We'll also ask you to code through several small programs from scratch to get a feel for how fluent you are with programming, and get a feel for your thought process. Be familiar with:
+
+working with simple data structures like arrays and hashes
+be able to manipulate arrays and hashes very fluently. For example, an exercise might be "reverse an array without using the built-in reverse method", or "select the element out of the array if its index is a fibonacci number", or "write a method to determine if a word is a palindrome, without using the reverse method", etc.
+We won't have a lot of time, so come prepared to code right away. There won't be much time to warm up, so you'll have to warm up beforehand.
+
+Communication Style
+
+Finally, we're also assessing your ability to communicate clearly. You should speak in a clear tone and you should explain concepts with precision using the correct vocabulary. If you haven't done this before, it's likely you'll need to practice before the interview. There's a reason the previous sentence is in bold.
+
+When you make a mistake, we're also looking for how you recover -- or whether you are able to recover at all.
+
+Assessment Prep Videos
+
+We did a Beginning Ruby series that will serve as great review for this test. Specifically, the sessions that are relevant to this assessment are below. The exercises you see in parts 4 and 5 will be on par with the exercises you'll see on the interview.
+
+Part 4 - Derick does a few exercises
+Part 5 - Conrad does a few exercises
+Part 6 - Debugging

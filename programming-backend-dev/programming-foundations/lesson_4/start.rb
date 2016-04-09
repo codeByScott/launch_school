@@ -1,0 +1,3 @@
+require "./unbeatableTTT"
+
+TicTacToe.new
