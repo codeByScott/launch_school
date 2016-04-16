@@ -1,12 +1,23 @@
-class Person
-  attr_accessor :name
-  
-  def initialize(name)
-    @name = name
+class Dog
+  def speak
+    'bark!'
+  end
+
+  def swim
+    'swimming!'
   end
 end
 
-bob = Person.new('bob')
-bob.name                  # => 'bob'
-bob.name = 'Robert'
-bob.name                  # => 'Robert'
+class Bulldog < Dog
+  def swim
+    'Can\'t swim'
+  end
+end
+
+teddy = Dog.new
+puts teddy.speak           # => "bark!"
+puts teddy.swim           # => "swimming!"
+
+karl = Bulldog.new
+puts karl.speak
+puts karl.swim
