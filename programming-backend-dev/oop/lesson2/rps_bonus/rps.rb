@@ -16,10 +16,11 @@
 # Verbs: choose, compare
 
 class Player
-  attr_accessor :move, :name
+  attr_accessor :move, :name, :score
 
   def initialize
     set_name
+    @score = Score.new
   end
 end
 
@@ -95,7 +96,19 @@ class Move
   end
 end
 
+class Score
+  attr_accessor :wins, :losses, :draws
+
+  def initialize
+    @wins = 0
+    @losses = 0
+    @draws = 0
+  end
+end
+
 class RPSGame
+  BEST_OF = 2
+
   attr_accessor :human, :computer
 
   def initialize
@@ -111,8 +124,13 @@ class RPSGame
       computer.choose
       display_moves
       display_winner
-
-      break unless play_again?
+      update_score
+      display_score(human)
+      display_score(computer)
+      if game_over?
+        reset_score
+        break unless play_again?
+      end
     end
 
     display_goodbye_message
@@ -121,11 +139,11 @@ class RPSGame
   private
 
   def display_welcome_message
-    puts "Welcome"
+    puts "Welcome to Rock, Paper, Scissors!"
   end
 
   def display_goodbye_message
-    puts "Goodbye"
+    puts "Thanks for playing, goodbye!"
   end
 
   def display_moves
@@ -133,13 +151,75 @@ class RPSGame
     puts "#{computer.name} chose #{computer.move}"
   end
 
+  def human_won?
+    human.move > computer.move
+  end
+
+  def computer_won?
+    computer.move > human.move
+  end
+
+  def adjust_score_for_draw
+    human.score.draws += 1
+    computer.score.draws += 1
+  end
+
+  def adjust_score_for_human_win
+    human.score.wins += 1
+    computer.score.losses += 1
+  end
+
+  def adjust_score_for_computer_win
+    computer.score.wins += 1
+    human.score.losses += 1
+  end
+
+  def update_score
+    if human_won?
+      adjust_score_for_human_win
+    elsif computer_won?
+      adjust_score_for_computer_win
+    else
+      adjust_score_for_draw
+    end
+  end
+
+  def reset_score
+    human.score.wins = 0
+    human.score.losses = 0
+    human.score.draws = 0
+    computer.score.wins = 0
+    computer.score.losses = 0
+    computer.score.draws = 0
+  end
+
   def display_winner
-    if human.move > computer.move
+    if human_won?
       puts "#{human.name} won!"
-    elsif computer.move > human.move
+    elsif computer_won?
       puts "#{computer.name} won!"
     else
       puts "It's a tie!"
+    end
+  end
+
+  def display_score(player)
+    puts truncate(player.name, 15).to_s.ljust(20) +
+         "Wins: #{player.score.wins}".ljust(20) +
+         "Losses: #{player.score.losses}".center(20) +
+         "Draws: #{player.score.draws}".rjust(20)
+  end
+
+  def truncate(string, length)
+    if string.size > length
+      truncated = string.split(//)
+      loop do
+        truncated.pop
+        break if truncated.size == length
+      end
+      truncated.join + "..."
+    else
+      string
     end
   end
 
@@ -154,6 +234,10 @@ class RPSGame
 
     return false if answer.downcase == 'n'
     return true if answer.downcase == 'y'
+  end
+
+  def game_over?
+    (human.score.wins == BEST_OF) || (computer.score.wins == BEST_OF)
   end
 end
 
