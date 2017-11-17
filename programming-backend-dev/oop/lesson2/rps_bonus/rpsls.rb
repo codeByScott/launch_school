@@ -27,7 +27,7 @@ class Human < Player
   def choose
     choice = nil
     loop do
-      puts "Please choose rock, paper, or scissors:"
+      puts "Please choose rock, paper, scissors, lizard, spock:"
       choice = gets.chomp
       break if Move::VALUES.include? choice
       puts "Sorry, invalid choice."
@@ -60,7 +60,7 @@ end
 class Move
   attr_reader :value
 
-  VALUES = ['rock', 'paper', 'scissors'].freeze
+  VALUES = ['rock', 'paper', 'scissors', 'lizard', 'spock'].freeze
 
   def initialize(value)
     @value = value
@@ -78,16 +78,16 @@ class Move
     @value == 'scissors'
   end
 
-  def >(other_move)
-    (rock? && other_move.scissors?) ||
-      (paper? && other_move.rock?) ||
-      (scissors? && other_move.paper?)
+  def lizard?
+    @value == 'lizard'
   end
 
-  def <(other_move)
-    (rock? && other_move.paper?) ||
-      (paper? && other_move.scissors?) ||
-      (scissors? && other_move.rock?)
+  def spock?
+    @value == 'spock'
+  end
+
+  def >(other_move)
+    RPSGame::WIN_COMBOS.include?([value, other_move.value])
   end
 
   def to_s
@@ -97,6 +97,13 @@ end
 
 class RPSGame
   attr_accessor :human, :computer
+
+  WIN_COMBOS = [
+    ['scissors', 'paper'], ['paper', 'rock'], ['rock', 'lizard'],
+    ['lizard', 'spock'], ['spock', 'scissors'], ['scissors', 'lizard'],
+    ['lizard', 'paper'], ['paper', 'spock'], ['spock', 'rock'],
+    ['rock', 'scissors']
+  ].freeze
 
   def initialize
     @human = Human.new
