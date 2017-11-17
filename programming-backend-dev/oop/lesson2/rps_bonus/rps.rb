@@ -16,10 +16,11 @@
 # Verbs: choose, compare
 
 class Player
-  attr_accessor :move, :name
+  attr_accessor :move, :name, :score
 
   def initialize
     set_name
+    @score = {wins: 0, losses: 0, draws: 0}
   end
 end
 
@@ -111,7 +112,8 @@ class RPSGame
       computer.choose
       display_moves
       display_winner
-
+      update_score
+      display_score
       break unless play_again?
     end
 
@@ -141,6 +143,19 @@ class RPSGame
     else
       puts "It's a tie!"
     end
+  end
+
+  def update_score
+    human.score[:wins] += 1 if human.move > computer.move
+    computer.score[:wins] += 1 if computer.move > human.move
+  end
+
+  def display_score
+    puts "Winning hands"
+    puts "-" * 80
+    puts "#{human.name}: #{human.score[:wins]}"
+    puts "-" * 80
+    puts "#{computer.name}: #{computer.score[:wins]}"
   end
 
   def play_again?
