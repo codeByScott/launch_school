@@ -1,25 +1,11 @@
-# the user makes a choice
-# the computer makes a choice
-# the winner is displayed
-
-# Rock, Paper, Scissors is a two-player game where each player chooses
-# one of three possible moves: rock, paper, or scissors. The chosen moves
-# will then be compared to see who wins, according to the following rules:
-#
-# - rock beats scissors
-# - scissors beats paper
-# - paper beats rock
-#
-# If the players chose the same move, then it's a tie.
-
-# Nouns: player, move, rule
-# Verbs: choose, compare
+ScoreKeeper = Struct.new(:wins, :losses, :draws)
 
 class Player
-  attr_accessor :move, :name
+  attr_accessor :move, :name, :score
 
   def initialize
     set_name
+    @score = ScoreKeeper.new(0, 0, 0) # sets wins, losses, draws to zero
   end
 end
 
@@ -118,7 +104,8 @@ class RPSGame
       computer.choose
       display_moves
       display_winner
-
+      display_score(human)
+      display_score(computer)
       break unless play_again?
     end
 
@@ -143,11 +130,26 @@ class RPSGame
   def display_winner
     if human.move > computer.move
       puts "#{human.name} won!"
+      human.score.wins += 1
+      computer.score.losses += 1
     elsif computer.move > human.move
       puts "#{computer.name} won!"
+      computer.score.wins += 1
+      human.score.losses += 1
     else
       puts "It's a tie!"
+      human.score.draws += 1
+      computer.score.draws += 1
     end
+  end
+
+  def display_score(player)
+    puts player.name.to_s.ljust(20) +
+         "Wins: #{player.score.wins}".rjust(20) +
+         "Losses: #{player.score.losses}".rjust(20) +
+         "Draws: #{player.score.draws}".rjust(20)
+    puts "-" * 80
+    puts
   end
 
   def play_again?
