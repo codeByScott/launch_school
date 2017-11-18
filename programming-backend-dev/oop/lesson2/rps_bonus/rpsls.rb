@@ -14,11 +14,11 @@ class Human < Player
     choice = nil
     loop do
       puts "Please choose rock, paper, scissors, lizard, spock:"
-      choice = gets.chomp
+      choice = gets.chomp.downcase
       break if Move::VALUES.include? choice
       puts "Sorry, invalid choice."
     end
-    self.move = Move.new(choice)
+    self.move = Move.new(choice).value
   end
 
   def set_name
@@ -35,7 +35,7 @@ end
 
 class Computer < Player
   def choose
-    self.move = Move.new(Move::VALUES.sample)
+    self.move = Move.new(Move::VALUES.sample).value
   end
 
   def set_name
@@ -52,44 +52,14 @@ class Move
     @value = value
   end
 
-  def rock?
-    @value == 'rock'
-  end
-
-  def paper?
-    @value == 'paper'
-  end
-
-  def scissors?
-    @value == 'scissors'
-  end
-
-  def lizard?
-    @value == 'lizard'
-  end
-
-  def spock?
-    @value == 'spock'
-  end
-
-  def >(other_move)
-    RPSGame::WIN_COMBOS.include?([value, other_move.value])
-  end
-
   def to_s
     value
   end
 end
 
 class RPSGame
+  BEST_OF = 3
   attr_accessor :human, :computer
-
-  WIN_COMBOS = [
-    ['scissors', 'paper'], ['paper', 'rock'], ['rock', 'lizard'],
-    ['lizard', 'spock'], ['spock', 'scissors'], ['scissors', 'lizard'],
-    ['lizard', 'paper'], ['paper', 'spock'], ['spock', 'rock'],
-    ['rock', 'scissors']
-  ].freeze
 
   def initialize
     @human = Human.new
@@ -104,15 +74,28 @@ class RPSGame
       computer.choose
       display_moves
       display_winner
+      update_score
       display_score(human)
       display_score(computer)
-      break unless play_again?
+      if game_over?
+        break unless play_again?
+        reset_score
+      end
     end
 
     display_goodbye_message
   end
 
   private
+
+  def reset_score
+    human.score.wins = 0
+    human.score.losses = 0
+    human.score.draws = 0
+    computer.score.wins = 0
+    computer.score.losses = 0
+    computer.score.draws = 0
+  end
 
   def display_welcome_message
     puts "Welcome"
@@ -127,19 +110,56 @@ class RPSGame
     puts "#{computer.name} chose #{computer.move}"
   end
 
+  def decision_engine
+    {
+      rock: ['scissors', 'lizard'],
+      paper: ['rock', 'spock'],
+      scissors: ['paper', 'lizard'],
+      lizard: ['spock', 'paper'],
+      spock: ['scissors', 'rock']
+    }
+  end
+
+  def human_won?
+    decision_engine[human.move.to_sym].include? computer.move
+  end
+
+  def computer_won?
+    decision_engine[computer.move.to_sym].include? human.move
+  end
+
   def display_winner
-    if human.move > computer.move
+    if human_won?
       puts "#{human.name} won!"
-      human.score.wins += 1
-      computer.score.losses += 1
-    elsif computer.move > human.move
+    elsif computer_won?
       puts "#{computer.name} won!"
-      computer.score.wins += 1
-      human.score.losses += 1
     else
       puts "It's a tie!"
-      human.score.draws += 1
-      computer.score.draws += 1
+    end
+  end
+
+  def adjust_score_for_human_win
+    human.score.wins += 1
+    computer.score.losses += 1
+  end
+
+  def adjust_score_for_computer_win
+    computer.score.wins += 1
+    human.score.losses += 1
+  end
+
+  def adjust_score_for_draw
+    human.score.draws += 1
+    computer.score.draws += 1
+  end
+
+  def update_score
+    if human_won?
+      adjust_score_for_human_win
+    elsif computer_won?
+      adjust_score_for_computer_win
+    else
+      adjust_score_for_draw
     end
   end
 
@@ -152,17 +172,21 @@ class RPSGame
     puts
   end
 
+  def game_over?
+    (human.score.wins == BEST_OF) || (computer.score.wins == BEST_OF)
+  end
+
   def play_again?
     answer = nil
     loop do
       puts "Would you like to play again?"
       answer = gets.chomp
-      break if ['y', 'n'].include? answer.downcase
+      break if ['y', 'yes', 'n', 'no'].include? answer.downcase
       puts "Sorry, must be y or n."
     end
 
-    return false if answer.downcase == 'n'
-    return true if answer.downcase == 'y'
+    return false if ['n', 'no'].include? answer.downcase
+    return true if ['y', 'yes'].include? answer.downcase
   end
 end
 
