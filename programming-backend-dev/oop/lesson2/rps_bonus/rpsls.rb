@@ -1,4 +1,5 @@
 ScoreKeeper = Struct.new(:wins, :losses, :draws)
+Logger = Struct.new(:player_one, :player_two)
 
 class Player
   attr_accessor :move, :name, :score
@@ -59,11 +60,12 @@ end
 
 class RPSGame
   BEST_OF = 3
-  attr_accessor :human, :computer
+  attr_accessor :human, :computer, :move_history
 
   def initialize
     @human = Human.new
     @computer = Computer.new
+    @move_history = Logger.new([], [])
   end
 
   def play
@@ -73,8 +75,11 @@ class RPSGame
       human.choose
       computer.choose
       display_moves
+      log_moves_to_history
+      p move_history
       display_winner
       update_score
+
       display_score(human)
       display_score(computer)
       if game_over?
@@ -88,13 +93,19 @@ class RPSGame
 
   private
 
+  def log_moves_to_history
+    move_history.player_one << @human.move
+    move_history.player_two << @computer.move
+  end
+
   def reset_score
-    human.score.wins = 0
-    human.score.losses = 0
-    human.score.draws = 0
-    computer.score.wins = 0
-    computer.score.losses = 0
-    computer.score.draws = 0
+    human.score.members.each do |member|
+      human.score[member] = 0
+    end
+
+    computer.score.members.each do |member|
+      computer.score[member] = 0
+    end
   end
 
   def display_welcome_message
@@ -110,7 +121,7 @@ class RPSGame
     puts "#{computer.name} chose #{computer.move}"
   end
 
-  def decision_engine
+  def decision
     {
       rock: ['scissors', 'lizard'],
       paper: ['rock', 'spock'],
@@ -121,11 +132,11 @@ class RPSGame
   end
 
   def human_won?
-    decision_engine[human.move.to_sym].include? computer.move
+    decision[human.move.to_sym].include? computer.move
   end
 
   def computer_won?
-    decision_engine[computer.move.to_sym].include? human.move
+    decision[computer.move.to_sym].include? human.move
   end
 
   def display_winner
@@ -168,8 +179,11 @@ class RPSGame
          "Wins: #{player.score.wins}".rjust(20) +
          "Losses: #{player.score.losses}".rjust(20) +
          "Draws: #{player.score.draws}".rjust(20)
+    border
+  end
+
+  def border
     puts "-" * 80
-    puts
   end
 
   def game_over?
