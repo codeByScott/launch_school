@@ -87,11 +87,61 @@ class RPSGame
         reset_score
       end
     end
-
+    display_stats if user_wants_stats?
     display_goodbye_message
   end
 
   private
+
+  def stats_header
+    border
+    puts '|  ' + 'Round'.center(10.75)    +
+         '|'   + "#{human.name}'s move".center(22.75)      +
+         '|'   + "#{computer.name}'s move".center(22.75) +
+         '|'   + 'Outcome'.center(18.75)  +
+         ' |'
+    border
+  end
+
+  def display_stats
+    stats_header
+    round = 1
+
+    moves = move_history.player_one.zip(move_history.player_two)
+    moves.each do |move|
+      puts '|  ' + round.to_s.center(10.75) +
+           '|'   + move[0].center(22.75) +
+           '|'   + move[1].center(22.75) +
+           '|'   + round_result(move[0], move[1]).center(18.75) +
+           ' |'
+      border
+      round += 1
+    end
+  end
+
+  def round_result(human_move, computer_move)
+    if decision[human_move.to_sym].include? computer_move
+      "win"
+    elsif decision[computer_move.to_sym].include? human_move
+      "lose"
+    else
+      "draw"
+    end
+  end
+
+  def user_wants_stats?
+    puts "Would you like to see the game stats?"
+    answer = nil
+
+    loop do
+      answer = gets.chomp
+      break if ['y', 'yes', 'n', 'no'].include? answer.downcase
+      puts "Sorry you must enter 'y' or 'n'."
+    end
+
+    return false if ['n', 'no'].include? answer.downcase
+    return true if ['y', 'yes'].include? answer.downcase
+  end
 
   def log_moves_to_history
     move_history.player_one << @human.move
