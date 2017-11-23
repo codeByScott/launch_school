@@ -1,5 +1,5 @@
 ScoreKeeper = Struct.new(:wins, :losses, :draws)
-Logger = Struct.new(:player_one, :player_two)
+Logger = Struct.new(:human_moves, :computer_moves, :results)
 
 class Player
   attr_accessor :move, :name, :score
@@ -65,7 +65,7 @@ class RPSGame
   def initialize
     @human = Human.new
     @computer = Computer.new
-    @move_history = Logger.new([], [])
+    @move_history = Logger.new([], [], [])
   end
 
   def play
@@ -75,7 +75,7 @@ class RPSGame
       human.choose
       computer.choose
       display_moves
-      log_moves_to_history
+      log_round_to_history
       p move_history
       display_winner
       update_score
@@ -95,10 +95,10 @@ class RPSGame
 
   def stats_header
     border
-    puts '|  ' + 'Round'.center(10.75)    +
-         '|'   + "#{human.name}'s move".center(22.75)      +
+    puts '|  ' + 'Round'.center(10.75) +
+         '|'   + "#{human.name}'s move".center(22.75) +
          '|'   + "#{computer.name}'s move".center(22.75) +
-         '|'   + 'Outcome'.center(18.75)  +
+         '|'   + 'Outcome'.center(18.75) +
          ' |'
     border
   end
@@ -107,22 +107,26 @@ class RPSGame
     stats_header
     round = 1
 
-    moves = move_history.player_one.zip(move_history.player_two)
-    moves.each do |move|
+    results = move_history.human_moves.zip(
+      move_history.computer_moves,
+      move_history.results
+    )
+
+    results.each do |result|
       puts '|  ' + round.to_s.center(10.75) +
-           '|'   + move[0].center(22.75) +
-           '|'   + move[1].center(22.75) +
-           '|'   + round_result(move[0], move[1]).center(18.75) +
+           '|'   + result[0].center(22.75) +
+           '|'   + result[1].center(22.75) +
+           '|'   + result[2].center(18.75) +
            ' |'
       border
       round += 1
     end
   end
 
-  def round_result(human_move, computer_move)
-    if decision[human_move.to_sym].include? computer_move
+  def round_result
+    if human_won?
       "win"
-    elsif decision[computer_move.to_sym].include? human_move
+    elsif computer_won?
       "lose"
     else
       "draw"
@@ -143,9 +147,10 @@ class RPSGame
     return true if ['y', 'yes'].include? answer.downcase
   end
 
-  def log_moves_to_history
-    move_history.player_one << @human.move
-    move_history.player_two << @computer.move
+  def log_round_to_history
+    move_history.human_moves << human.move
+    move_history.computer_moves << computer.move
+    move_history.results << round_result
   end
 
   def reset_score
@@ -159,11 +164,11 @@ class RPSGame
   end
 
   def display_welcome_message
-    puts "Welcome"
+    puts "Welcome to Rock, Paper, Scissors, Lizard, Spock"
   end
 
   def display_goodbye_message
-    puts "Goodbye"
+    puts "Thank you for playing, Goodbye"
   end
 
   def display_moves
@@ -172,6 +177,7 @@ class RPSGame
   end
 
   def decision
+    # key beats its values
     {
       rock: ['scissors', 'lizard'],
       paper: ['rock', 'spock'],
