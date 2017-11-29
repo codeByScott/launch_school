@@ -2,27 +2,42 @@ ScoreKeeper = Struct.new(:wins, :losses, :draws)
 Logger = Struct.new(:human_moves, :computer_moves, :results)
 
 module Strategies
-  def first_round?
-    move_history.computer_moves.empty?
-  end
-
-  def opponents_last_move
-    move_history.human_moves.last
-  end
-
   def beat_opponents_last_move
-    opponents_last_move = move_history.human_moves.last
-
-    move_that_beats = {
-      rock: 'paper',
-      paper: 'scissors',
-      scissors: 'spock',
-      lizard: 'rock',
-      spock: 'lizard'
-    }
-
     move_that_beats[opponents_last_move.to_sym]
   end
+
+  def beat_opponents_best_move
+    move_that_beats[opponents_best_move.to_sym]
+  end
+
+  private
+    def move_that_beats
+      {
+        rock: 'paper',
+        paper: 'scissors',
+        scissors: 'spock',
+        lizard: 'rock',
+        spock: 'lizard'
+      }
+    end
+
+    def opponents_last_move
+      move_history.human_moves.last
+    end
+
+    def opponents_winning_moves
+      winning_moves = []
+      move_history.results.each_with_index do |result, idx|
+        winning_moves << move_history.human_moves[idx] if result == "win"
+      end
+      winning_moves
+    end
+
+    def opponents_best_move
+      # the opponents move that wins the most
+      moves = opponents_winning_moves
+      moves.max_by { |move| moves.count move }
+    end
 end
 
 class Player
@@ -63,15 +78,22 @@ class Computer < Player
   include Strategies
 
   def choose
-    if first_round?
+    if my_first_round?
+      # based on the famous RPS game between Sotheby's and Christie's
       self.move = Move.new("scissors").value
     else
-      self.move = Move.new(beat_opponents_last_move).value
+      self.move = Move.new(beat_opponents_best_move).value
     end
   end
 
   def set_name
     self.name = ['C3PO', 'D.A.R.Y.L.', 'HAL', 'Number 5', 'Wall-e'].sample
+  end
+
+  private
+
+  def my_first_round?
+    move_history.computer_moves.empty?
   end
 end
 
@@ -107,7 +129,6 @@ class RPSGame
       computer.choose
       display_moves
       log_round_to_history
-      p move_history
       display_winner
       update_score
 
