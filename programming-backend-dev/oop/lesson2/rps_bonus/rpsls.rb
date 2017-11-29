@@ -1,11 +1,36 @@
 ScoreKeeper = Struct.new(:wins, :losses, :draws)
 Logger = Struct.new(:human_moves, :computer_moves, :results)
 
-class Player
-  attr_accessor :move, :name, :score
+module Strategies
+  def first_round?
+    move_history.computer_moves.empty?
+  end
 
-  def initialize
+  def opponents_last_move
+    move_history.human_moves.last
+  end
+
+  def beat_opponents_last_move
+    opponents_last_move = move_history.human_moves.last
+
+    move_that_beats = {
+      rock: 'paper',
+      paper: 'scissors',
+      scissors: 'spock',
+      lizard: 'rock',
+      spock: 'lizard'
+    }
+
+    move_that_beats[opponents_last_move.to_sym]
+  end
+end
+
+class Player
+  attr_accessor :move, :name, :score, :move_history
+
+  def initialize(move_history)
     set_name
+    @move_history = move_history
     @score = ScoreKeeper.new(0, 0, 0) # sets wins, losses, draws to zero
   end
 end
@@ -35,8 +60,14 @@ class Human < Player
 end
 
 class Computer < Player
+  include Strategies
+
   def choose
-    self.move = Move.new(Move::VALUES.sample).value
+    if first_round?
+      self.move = Move.new("scissors").value
+    else
+      self.move = Move.new(beat_opponents_last_move).value
+    end
   end
 
   def set_name
@@ -63,9 +94,9 @@ class RPSGame
   attr_accessor :human, :computer, :move_history
 
   def initialize
-    @human = Human.new
-    @computer = Computer.new
     @move_history = Logger.new([], [], [])
+    @human = Human.new(move_history)
+    @computer = Computer.new(move_history)
   end
 
   def play
