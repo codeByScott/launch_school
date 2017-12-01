@@ -5,7 +5,11 @@ Logger = Struct.new(:human_moves, :computer_moves, :results)
 
 module Strategies
   def beat_opponents_last_move
-    move_that_beats[opponents_last_move.to_sym]
+    if move_history.human_moves.empty?
+      Move::VALUES.sample
+    else
+      move_that_beats[opponents_last_move.to_sym]
+    end
   end
 
   def beat_opponents_best_move
@@ -49,12 +53,20 @@ class String
     "\e[#{color_code}m#{self}\e[0m"
   end
 
-  def red
-    colorize(31)
-  end
-
   def green
     colorize(32)
+  end
+
+  def truncate
+    if size <= 12
+      self
+    else
+      split = self.split('')
+      (size - 12).times do
+        split.delete_at(-1)
+      end
+      split.join('') + "..."
+    end
   end
 end
 
@@ -99,6 +111,28 @@ class Computer < Player
     set_name
   end
 
+  private
+
+  def my_first_round?
+    move_history.computer_moves.empty?
+  end
+end
+
+class C3PO < Computer
+  def set_name
+    self.name = 'C3PO'
+  end
+
+  def choose
+    self.move = Move.new(Move::VALUES.sample).value
+  end
+end
+
+class Daryl < Computer
+  def set_name
+    self.name = 'D.A.R.Y.L.'
+  end
+
   def choose
     self.move = if my_first_round?
                   # based on the famous RPS game between Sotheby's & Christie's
@@ -107,15 +141,15 @@ class Computer < Player
                   Move.new(beat_opponents_best_move).value
                 end
   end
+end
 
+class Hal < Computer
   def set_name
-    self.name = ['C3PO', 'D.A.R.Y.L.', 'HAL', 'Number 5', 'Wall-e'].sample
+    self.name = 'HAL'
   end
 
-  private
-
-  def my_first_round?
-    move_history.computer_moves.empty?
+  def choose
+    self.move = Move.new(beat_opponents_last_move).value
   end
 end
 
@@ -141,7 +175,11 @@ class RPSGame
   def initialize
     @move_history = Logger.new([], [], [])
     @human = Human.new(move_history)
-    @computer = Computer.new(move_history)
+    @computer = [
+      # C3PO.new(move_history),
+      Hal.new(move_history)
+      # Daryl.new(move_history)
+    ].sample
   end
 
   def play
@@ -177,7 +215,7 @@ class RPSGame
 
   def display_opponents_name
     puts ""
-    puts "Hi, #{human.name} you will be playing against"\
+    puts "Hi, #{human.name.truncate} you will be playing against"\
          " #{computer.name}.".center(WIDTH)
     puts ""
   end
@@ -209,7 +247,7 @@ class RPSGame
   def stats_header
     border
     puts '|  ' + 'Round'.center(WIDTH * 0.134375) +
-         '|'   + "#{human.name}'s move".center(WIDTH * 0.284375) +
+         '|'   + "#{human.name.truncate}'s move".center(WIDTH * 0.284375) +
          '|'   + "#{computer.name}'s move".center(WIDTH * 0.284375) +
          '|'   + 'Outcome'.center(WIDTH * 0.234375) +
          ' |'
@@ -289,7 +327,7 @@ class RPSGame
   end
 
   def moves
-    "#{human.name} chose #{human.move}, #{computer.name} chose #{computer.move}."
+    "#{human.name.truncate} chose #{human.move}, #{computer.name} chose #{computer.move}."
   end
 
   def decision
@@ -313,7 +351,7 @@ class RPSGame
 
   def winner
     if human_won?
-      "#{human.name} won!"
+      "#{human.name.truncate} won!"
     elsif computer_won?
       "#{computer.name} won!"
     else
@@ -353,7 +391,7 @@ class RPSGame
   end
 
   def display_score(player)
-    puts player.name.to_s.ljust(WIDTH * 0.25) +
+    puts player.name.truncate.ljust(WIDTH * 0.25) +
          "Wins: #{player.score.wins}".rjust(WIDTH * 0.25) +
          "Losses: #{player.score.losses}".rjust(WIDTH * 0.25) +
          "Draws: #{player.score.draws}".rjust(WIDTH * 0.25)
