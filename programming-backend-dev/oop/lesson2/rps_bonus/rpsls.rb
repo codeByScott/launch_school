@@ -39,6 +39,7 @@ module Strategies
   private
 
   def move_that_beats
+    # The values beat their keys
     {
       rock: 'paper',
       paper: 'scissors',
