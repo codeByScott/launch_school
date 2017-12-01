@@ -1,3 +1,5 @@
+require 'pry'
+
 ScoreKeeper = Struct.new(:wins, :losses, :draws)
 Logger = Struct.new(:human_moves, :computer_moves, :results)
 
@@ -11,40 +13,55 @@ module Strategies
   end
 
   private
-    def move_that_beats
-      {
-        rock: 'paper',
-        paper: 'scissors',
-        scissors: 'spock',
-        lizard: 'rock',
-        spock: 'lizard'
-      }
-    end
 
-    def opponents_last_move
-      move_history.human_moves.last
-    end
+  def move_that_beats
+    {
+      rock: 'paper',
+      paper: 'scissors',
+      scissors: 'spock',
+      lizard: 'rock',
+      spock: 'lizard'
+    }
+  end
 
-    def opponents_winning_moves
-      winning_moves = []
-      move_history.results.each_with_index do |result, idx|
-        winning_moves << move_history.human_moves[idx] if result == "win"
-      end
-      winning_moves
-    end
+  def opponents_last_move
+    move_history.human_moves.last
+  end
 
-    def opponents_best_move
-      # the opponents move that wins the most
-      moves = opponents_winning_moves
-      moves.max_by { |move| moves.count move }
+  def opponents_winning_moves
+    winning_moves = []
+    move_history.results.each_with_index do |result, idx|
+      winning_moves << move_history.human_moves[idx] if result == "win"
     end
+    winning_moves
+  end
+
+  def opponents_best_move
+    # the opponents move that wins the most, or the last move if no wins
+    winning_moves = opponents_winning_moves
+    moves = winning_moves.any? ? winning_moves : opponents_last_move.split
+    moves.max_by { |move| moves.count move }
+  end
+end
+
+class String
+  def colorize(color_code)
+    "\e[#{color_code}m#{self}\e[0m"
+  end
+
+  def red
+    colorize(31)
+  end
+
+  def green
+    colorize(32)
+  end
 end
 
 class Player
   attr_accessor :move, :name, :score, :move_history
 
   def initialize(move_history)
-    set_name
     @move_history = move_history
     @score = ScoreKeeper.new(0, 0, 0) # sets wins, losses, draws to zero
   end
@@ -77,13 +94,18 @@ end
 class Computer < Player
   include Strategies
 
+  def initialize(move_history)
+    super
+    set_name
+  end
+
   def choose
-    if my_first_round?
-      # based on the famous RPS game between Sotheby's and Christie's
-      self.move = Move.new("scissors").value
-    else
-      self.move = Move.new(beat_opponents_best_move).value
-    end
+    self.move = if my_first_round?
+                  # based on the famous RPS game between Sotheby's & Christie's
+                  Move.new("scissors").value
+                else
+                  Move.new(beat_opponents_best_move).value
+                end
   end
 
   def set_name
@@ -112,7 +134,8 @@ class Move
 end
 
 class RPSGame
-  BEST_OF = 3
+  NUMBER_OF_ROUNDS = 3
+  WIDTH = 80
   attr_accessor :human, :computer, :move_history
 
   def initialize
@@ -122,40 +145,79 @@ class RPSGame
   end
 
   def play
-    display_welcome_message
+    display_game_title
+    display_rules
+    display_best_of(NUMBER_OF_ROUNDS)
+    get_player_name(human)
+    clear_display
+    display_game_title
+    display_opponents_name
 
     loop do
       human.choose
       computer.choose
-      display_moves
       log_round_to_history
-      display_winner
       update_score
 
+      clear_display
+      display_game_title
       display_score(human)
-      display_score(computer)
+      display_round_results
+
       if game_over?
         break unless play_again?
         reset_score
       end
     end
     display_stats if user_wants_stats?
-    display_goodbye_message
+    display_footer
   end
 
   private
 
+  def display_opponents_name
+    puts ""
+    puts "Hi, #{human.name} you will be playing against"\
+         " #{computer.name}.".center(WIDTH)
+    puts ""
+  end
+
+  def display_best_of(number_of_rounds)
+    puts
+    puts "Best of #{number_of_rounds} rounds wins. Good luck!".center(WIDTH)
+    puts
+  end
+
+  def display_rules
+    puts "Scissors cuts Paper covers Rock crushes Lizard poisons Spock "\
+         "smashes\nScissors decapitates Lizard eats Paper disproves Spock "\
+         "vaporizes\nRock crushes Scissors"
+  end
+
+  def display_game_title
+    clear_display
+    border
+    puts "ROCK, PAPER, SCISSORS, LIZARD, SPOCK".ljust(WIDTH * 0.625) +
+         "Created by CodeByScott".rjust(WIDTH * 0.375).green
+    border
+  end
+
+  def clear_display
+    system('clear') || system('clr')
+  end
+
   def stats_header
     border
-    puts '|  ' + 'Round'.center(10.75) +
-         '|'   + "#{human.name}'s move".center(22.75) +
-         '|'   + "#{computer.name}'s move".center(22.75) +
-         '|'   + 'Outcome'.center(18.75) +
+    puts '|  ' + 'Round'.center(WIDTH * 0.134375) +
+         '|'   + "#{human.name}'s move".center(WIDTH * 0.284375) +
+         '|'   + "#{computer.name}'s move".center(WIDTH * 0.284375) +
+         '|'   + 'Outcome'.center(WIDTH * 0.234375) +
          ' |'
     border
   end
 
   def display_stats
+    display_game_title
     stats_header
     round = 1
 
@@ -165,10 +227,10 @@ class RPSGame
     )
 
     results.each do |result|
-      puts '|  ' + round.to_s.center(10.75) +
-           '|'   + result[0].center(22.75) +
-           '|'   + result[1].center(22.75) +
-           '|'   + result[2].center(18.75) +
+      puts '|  ' + round.to_s.center(WIDTH * 0.134375) +
+           '|'   + result[0].center(WIDTH * 0.284375) +
+           '|'   + result[1].center(WIDTH * 0.284375) +
+           '|'   + result[2].center(WIDTH * 0.234375) +
            ' |'
       border
       round += 1
@@ -219,13 +281,15 @@ class RPSGame
     puts "Welcome to Rock, Paper, Scissors, Lizard, Spock"
   end
 
-  def display_goodbye_message
-    puts "Thank you for playing, Goodbye"
+  def display_footer
+    puts "*" * WIDTH
+    puts "-" * WIDTH
+    puts "The RPSLS game was originally created by Sam Kass".center(WIDTH)
+    puts "-" * WIDTH
   end
 
-  def display_moves
-    puts "#{human.name} chose #{human.move}"
-    puts "#{computer.name} chose #{computer.move}"
+  def moves
+    "#{human.name} chose #{human.move}, #{computer.name} chose #{computer.move}."
   end
 
   def decision
@@ -247,14 +311,20 @@ class RPSGame
     decision[computer.move.to_sym].include? human.move
   end
 
-  def display_winner
+  def winner
     if human_won?
-      puts "#{human.name} won!"
+      "#{human.name} won!"
     elsif computer_won?
-      puts "#{computer.name} won!"
+      "#{computer.name} won!"
     else
-      puts "It's a tie!"
+      "It's a tie!"
     end
+  end
+
+  def display_round_results
+    puts
+    puts "#{moves} #{winner}".center(WIDTH)
+    puts
   end
 
   def adjust_score_for_human_win
@@ -283,19 +353,23 @@ class RPSGame
   end
 
   def display_score(player)
-    puts player.name.to_s.ljust(20) +
-         "Wins: #{player.score.wins}".rjust(20) +
-         "Losses: #{player.score.losses}".rjust(20) +
-         "Draws: #{player.score.draws}".rjust(20)
+    puts player.name.to_s.ljust(WIDTH * 0.25) +
+         "Wins: #{player.score.wins}".rjust(WIDTH * 0.25) +
+         "Losses: #{player.score.losses}".rjust(WIDTH * 0.25) +
+         "Draws: #{player.score.draws}".rjust(WIDTH * 0.25)
     border
   end
 
+  def get_player_name(player)
+    player.set_name
+  end
+
   def border
-    puts "-" * 80
+    puts "-" * WIDTH
   end
 
   def game_over?
-    (human.score.wins == BEST_OF) || (computer.score.wins == BEST_OF)
+    (human.score.wins == NUMBER_OF_ROUNDS) || (computer.score.wins == NUMBER_OF_ROUNDS)
   end
 
   def play_again?
