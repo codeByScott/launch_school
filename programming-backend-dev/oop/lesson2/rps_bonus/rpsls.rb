@@ -1,7 +1,27 @@
-require 'pry'
-
 ScoreKeeper = Struct.new(:wins, :losses, :draws)
 Logger = Struct.new(:human_moves, :computer_moves, :results)
+
+class String
+  def colorize(color_code)
+    "\e[#{color_code}m#{self}\e[0m"
+  end
+
+  def green
+    colorize(32)
+  end
+
+  def truncate
+    if size <= 12
+      self
+    else
+      split = self.split('')
+      (size - 12).times do
+        split.delete_at(-1)
+      end
+      split.join('') + "..."
+    end
+  end
+end
 
 module Strategies
   def beat_opponents_last_move
@@ -45,28 +65,6 @@ module Strategies
     winning_moves = opponents_winning_moves
     moves = winning_moves.any? ? winning_moves : opponents_last_move.split
     moves.max_by { |move| moves.count move }
-  end
-end
-
-class String
-  def colorize(color_code)
-    "\e[#{color_code}m#{self}\e[0m"
-  end
-
-  def green
-    colorize(32)
-  end
-
-  def truncate
-    if size <= 12
-      self
-    else
-      split = self.split('')
-      (size - 12).times do
-        split.delete_at(-1)
-      end
-      split.join('') + "..."
-    end
   end
 end
 
@@ -176,31 +174,21 @@ class RPSGame
     @move_history = Logger.new([], [], [])
     @human = Human.new(move_history)
     @computer = [
-      # C3PO.new(move_history),
-      Hal.new(move_history)
-      # Daryl.new(move_history)
+      C3PO.new(move_history),
+      Hal.new(move_history),
+      Daryl.new(move_history)
     ].sample
   end
 
   def play
-    display_game_title
-    display_rules
-    display_best_of(NUMBER_OF_ROUNDS)
+    display_start_screen
     get_player_name(human)
-    clear_display
-    display_game_title
-    display_opponents_name
+    display_ready_screen
 
     loop do
-      human.choose
-      computer.choose
-      log_round_to_history
-      update_score
-
-      clear_display
-      display_game_title
-      display_score(human)
-      display_round_results
+      players_choose
+      log_round_and_update_score
+      update_display
 
       if game_over?
         break unless play_again?
@@ -212,6 +200,36 @@ class RPSGame
   end
 
   private
+
+  def update_display
+    clear_display
+    display_game_title
+    display_score(human)
+    display_round_results
+  end
+
+  def players_choose
+    human.choose
+    computer.choose
+  end
+
+  def log_round_and_update_score
+    log_round_to_history
+    update_score
+  end
+
+  def display_start_screen
+    clear_display
+    display_game_title
+    display_rules
+    display_best_of(NUMBER_OF_ROUNDS)
+  end
+
+  def display_ready_screen
+    clear_display
+    display_game_title
+    display_opponents_name
+  end
 
   def display_opponents_name
     puts ""
@@ -233,7 +251,6 @@ class RPSGame
   end
 
   def display_game_title
-    clear_display
     border
     puts "ROCK, PAPER, SCISSORS, LIZARD, SPOCK".ljust(WIDTH * 0.625) +
          "Created by CodeByScott".rjust(WIDTH * 0.375).green
@@ -246,17 +263,53 @@ class RPSGame
 
   def stats_header
     border
-    puts '|  ' + 'Round'.center(WIDTH * 0.134375) +
-         '|'   + "#{human.name.truncate}'s move".center(WIDTH * 0.284375) +
-         '|'   + "#{computer.name}'s move".center(WIDTH * 0.284375) +
-         '|'   + 'Outcome'.center(WIDTH * 0.234375) +
-         ' |'
+    puts stats_header_col_one   +
+         stats_header_col_two   +
+         stats_header_col_three +
+         stats_header_col_four
     border
   end
 
+  def stats_header_col_one
+    '|  ' + 'Round'.center(WIDTH * 0.134375)
+  end
+
+  def stats_header_col_two
+    '|' + "#{human.name.truncate}'s move".center(WIDTH * 0.284375)
+  end
+
+  def stats_header_col_three
+    '|' + "#{computer.name}'s move".center(WIDTH * 0.284375)
+  end
+
+  def stats_header_col_four
+    '|' + 'Outcome'.center(WIDTH * 0.234375) + ' |'
+  end
+
   def display_stats
+    clear_display
     display_game_title
     stats_header
+    stats_round_data
+  end
+
+  def stats_col_one(round)
+    '|  ' + round.to_s.center(WIDTH * 0.134375)
+  end
+
+  def stats_col_two(result)
+    '|' + result[0].center(WIDTH * 0.284375)
+  end
+
+  def stats_col_three(result)
+    '|' + result[1].center(WIDTH * 0.284375)
+  end
+
+  def stats_col_four(result)
+    '|' + result[2].center(WIDTH * 0.234375) + ' |'
+  end
+
+  def stats_round_data
     round = 1
 
     results = move_history.human_moves.zip(
@@ -265,11 +318,10 @@ class RPSGame
     )
 
     results.each do |result|
-      puts '|  ' + round.to_s.center(WIDTH * 0.134375) +
-           '|'   + result[0].center(WIDTH * 0.284375) +
-           '|'   + result[1].center(WIDTH * 0.284375) +
-           '|'   + result[2].center(WIDTH * 0.234375) +
-           ' |'
+      puts  stats_col_one(round) +
+            stats_col_two(result) +
+            stats_col_three(result) +
+            stats_col_four(result)
       border
       round += 1
     end
@@ -327,7 +379,8 @@ class RPSGame
   end
 
   def moves
-    "#{human.name.truncate} chose #{human.move}, #{computer.name} chose #{computer.move}."
+    "#{human.name.truncate} chose #{human.move}, "\
+    " #{computer.name} chose #{computer.move}."
   end
 
   def decision
@@ -392,10 +445,22 @@ class RPSGame
 
   def display_score(player)
     puts player.name.truncate.ljust(WIDTH * 0.25) +
-         "Wins: #{player.score.wins}".rjust(WIDTH * 0.25) +
-         "Losses: #{player.score.losses}".rjust(WIDTH * 0.25) +
-         "Draws: #{player.score.draws}".rjust(WIDTH * 0.25)
+         display_wins(player) +
+         display_losses(player) +
+         display_draws(player)
     border
+  end
+
+  def display_wins(player)
+    "Wins: #{player.score.wins}".rjust(WIDTH * 0.25)
+  end
+
+  def display_losses(player)
+    "Losses: #{player.score.losses}".rjust(WIDTH * 0.25)
+  end
+
+  def display_draws(player)
+    "Draws: #{player.score.draws}".rjust(WIDTH * 0.25)
   end
 
   def get_player_name(player)
@@ -407,7 +472,8 @@ class RPSGame
   end
 
   def game_over?
-    (human.score.wins == NUMBER_OF_ROUNDS) || (computer.score.wins == NUMBER_OF_ROUNDS)
+    (human.score.wins == NUMBER_OF_ROUNDS) ||
+      (computer.score.wins == NUMBER_OF_ROUNDS)
   end
 
   def play_again?
