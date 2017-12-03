@@ -182,7 +182,7 @@ class RPSGame
   end
 
   def play
-    display_start_screen
+    display_welcome_screen
     get_player_name(human)
     display_ready_screen
 
@@ -194,8 +194,7 @@ class RPSGame
 
       if game_over?
         break unless play_again?
-        reset_score
-        update_display
+        reset_display
       end
     end
     display_stats if user_wants_stats?
@@ -210,6 +209,11 @@ class RPSGame
     display_score(human)
   end
 
+  def reset_display
+    reset_score
+    update_display
+  end
+
   def players_choose
     human.choose
     computer.choose
@@ -220,7 +224,7 @@ class RPSGame
     update_score
   end
 
-  def display_start_screen
+  def display_welcome_screen
     clear_display
     display_game_title
     display_rules
