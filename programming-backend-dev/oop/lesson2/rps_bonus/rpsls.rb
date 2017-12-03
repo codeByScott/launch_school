@@ -253,10 +253,10 @@ class RPSGame
   end
 
   def display_game_title
-    border
+    display_border
     puts "ROCK, PAPER, SCISSORS, LIZARD, SPOCK".ljust(WIDTH * 0.625) +
          "Created by CodeByScott".rjust(WIDTH * 0.375).green
-    border
+    display_border
   end
 
   def clear_display
@@ -264,12 +264,12 @@ class RPSGame
   end
 
   def stats_header
-    border
+    display_border
     puts stats_header_col_one   +
          stats_header_col_two   +
          stats_header_col_three +
          stats_header_col_four
-    border
+    display_border
   end
 
   def stats_header_col_one
@@ -324,7 +324,7 @@ class RPSGame
             stats_col_two(result) +
             stats_col_three(result) +
             stats_col_four(result)
-      border
+      display_border
       round += 1
     end
   end
@@ -450,7 +450,7 @@ class RPSGame
          display_wins(player) +
          display_losses(player) +
          display_draws(player)
-    border
+    display_border
   end
 
   def display_wins(player)
@@ -469,7 +469,7 @@ class RPSGame
     player.set_name
   end
 
-  def border
+  def display_border
     puts "-" * WIDTH
   end
 
