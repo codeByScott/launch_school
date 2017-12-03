@@ -91,14 +91,14 @@ class Human < Player
   end
 
   def set_name
-    n = ''
+    name = ''
     loop do
       puts "What's your name?"
-      n = gets.chomp
-      break unless n.empty?
-      puts "Sorry must enter a value."
+      name = gets.chomp
+      break unless name.strip.empty?
+      puts "Sorry, you must enter a value."
     end
-    self.name = n
+    self.name = name
   end
 end
 
