@@ -167,7 +167,7 @@ class Move
 end
 
 class RPSGame
-  NUMBER_OF_ROUNDS = 3
+  ROUNDS_TO_WIN = 3
   WIDTH = 80
   attr_accessor :human, :computer, :move_history
 
@@ -223,7 +223,7 @@ class RPSGame
     clear_display
     display_game_title
     display_rules
-    display_best_of(NUMBER_OF_ROUNDS)
+    display_rounds_to_win
   end
 
   def display_ready_screen
@@ -239,9 +239,9 @@ class RPSGame
     puts ""
   end
 
-  def display_best_of(number_of_rounds)
+  def display_rounds_to_win
     puts
-    puts "Best of #{number_of_rounds} rounds wins. Good luck!".center(WIDTH)
+    puts "First to win #{ROUNDS_TO_WIN} rounds is the champion.".center(WIDTH)
     puts
   end
 
@@ -473,8 +473,8 @@ class RPSGame
   end
 
   def game_over?
-    (human.score.wins == NUMBER_OF_ROUNDS) ||
-      (computer.score.wins == NUMBER_OF_ROUNDS)
+    (human.score.wins == ROUNDS_TO_WIN) ||
+      (computer.score.wins == ROUNDS_TO_WIN)
   end
 
   def play_again?
