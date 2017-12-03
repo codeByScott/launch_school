@@ -190,10 +190,12 @@ class RPSGame
       players_choose
       log_round_and_update_score
       update_display
+      display_round_results
 
       if game_over?
         break unless play_again?
         reset_score
+        update_display
       end
     end
     display_stats if user_wants_stats?
@@ -206,7 +208,6 @@ class RPSGame
     clear_display
     display_game_title
     display_score(human)
-    display_round_results
   end
 
   def players_choose
