@@ -1,4 +1,4 @@
-ScoreKeeper = Struct.new(:player_one_wins, :player_two_wins)
+ScoreKeeper = Struct.new(:human, :computer, :draw)
 
 class Board
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
@@ -93,11 +93,12 @@ class TTTGame
   HUMAN_MARKER = "X"
   COMPUTER_MARKER = "O"
   FIRST_TO_MOVE = HUMAN_MARKER
+  SCORE_TO_WIN = 3
 
-  attr_reader :board, :human, :computer
+  attr_reader :board, :human, :computer, :score
 
   def initialize
-    @score = ScoreKeeper.new(0, 0)
+    @score = ScoreKeeper.new(0, 0, 0)
     @board = Board.new
     @human = Player.new(HUMAN_MARKER)
     @computer = Player.new(COMPUTER_MARKER)
@@ -120,7 +121,12 @@ class TTTGame
       set_display
 
       display_result
-      break unless play_again?
+      update_score
+      display_score
+      if game_over?
+        reset_score
+        break unless play_again?
+     end
       reset
     end
 
@@ -128,6 +134,31 @@ class TTTGame
   end
 
   private
+
+  def reset_score
+    score.members.each { |member| score[member] = 0 }
+  end
+
+  def game_over?
+    score[:human] == SCORE_TO_WIN || score[:computer] == SCORE_TO_WIN
+  end
+
+  def update_score
+    case board.winning_marker
+    when human.marker
+      score.human += 1
+    when computer.marker
+      score.computer += 1
+    else
+      score.draw += 1
+    end
+  end
+
+  def display_score
+    puts "Human: #{score.human}"
+    puts "Computer: #{score.computer}"
+    puts "Draws: #{score.draw}"
+  end
 
   def human_turn?
     @current_marker == HUMAN_MARKER
@@ -200,6 +231,8 @@ class TTTGame
   def display_board
     board.draw
   end
+
+
 
   def display_result
     case board.winning_marker
