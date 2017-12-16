@@ -1,4 +1,5 @@
 # tic-tac-toe.rb
+require 'pry'
 
 INITIAL_TOKEN = ' '.freeze
 PLAYER_TOKEN = "X".freeze
@@ -176,6 +177,7 @@ def computer_place_token!(brd)
 end
 
 def ai_move(brd, line, token)
+  binding.pry
   if brd.values_at(*line).count(token) == 2
     brd.select { |k, v| line.include?(k) && v == INITIAL_TOKEN }.keys.first
   end
