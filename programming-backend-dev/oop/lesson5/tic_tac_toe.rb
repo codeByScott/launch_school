@@ -227,11 +227,6 @@ class TTTGame
     end
   end
 
-  # def computer_moves
-  #   square = board.unmarked_keys.sample
-  #   board[square] = computer.marker
-  # end
-
   def computer_moves
     square = nil
     Board::WINNING_LINES.each do |line|
@@ -247,12 +242,15 @@ class TTTGame
   end
 
   def find_at_risk_square(line)
-    binding.pry
-    if two_identical_markers?(line)
-
+    if two_consecutive_human_markers?(line)
+     line.select { |square| board.squares[square].marker == " " }.first
     else
       nil
     end
+  end
+
+  def two_consecutive_human_markers?(line)
+    line.count { |square| board.squares[square].marker == HUMAN_MARKER } == 2
   end
 
   def display_board
