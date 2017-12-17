@@ -242,15 +242,25 @@ class TTTGame
   end
 
   def find_at_risk_square(line)
-    if two_consecutive_human_markers?(line)
-     line.select { |square| board.squares[square].marker == " " }.first
+    if two_consecutive_computer_markers?(line)
+     choose_optimal_square(line)
+    elsif two_consecutive_human_markers?(line)
+      choose_optimal_square(line)
     else
       nil
     end
   end
 
+  def two_consecutive_computer_markers?(line)
+    line.count { |square| board.squares[square].marker == COMPUTER_MARKER } == 2
+  end
+
   def two_consecutive_human_markers?(line)
     line.count { |square| board.squares[square].marker == HUMAN_MARKER } == 2
+  end
+
+  def choose_optimal_square(line)
+    line.select { |square| board.squares[square].marker == " " }.first
   end
 
   def display_board
