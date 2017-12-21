@@ -216,50 +216,78 @@ class TTTGame
     board[square] = human.marker
   end
 
-  def joinor(array, delimeter= ', ', operator= 'or')
+  def joinor(array, delimeter= ', ', conjuction= 'or')
     case array.size
     when 0 then ''
     when 1 then array.first
-    when 2 then array.join(" #{operator} ")
+    when 2 then array.join(" #{conjuction} ")
     else
-      array[-1] = "#{operator} #{array.last}"
+      array[-1] = "#{conjuction} #{array.last}"
       array.join(delimeter)
     end
   end
 
   def computer_moves
+    # in order, do the following:
+    # check each line for an opportunity to win.
+    # check each line for an opportunity to block.
+    # pick square 5 if available.
+    # pick a random square.
+
     square = nil
+    
     Board::WINNING_LINES.each do |line|
-      square = find_at_risk_square(line)
+      square = find_winning_opportunity(line)
       break if square
     end
 
     if !square
+      Board::WINNING_LINES.each do |line|
+        square = find_blocking_opportunity(line)
+        break if square
+      end
+    end
+
+    if !square && board.squares[5].unmarked?
+      square = 5
+    elsif !square && board.squares[5].marked?
       square = board.unmarked_keys.sample
     end
 
     board[square] = COMPUTER_MARKER
   end
 
-  def find_at_risk_square(line)
-    if two_consecutive_computer_markers?(line)
-     choose_optimal_square(line)
-    elsif two_consecutive_human_markers?(line)
-      choose_optimal_square(line)
+  # right now, it is going through at risk squares, line by line. It will return the first at risk square.
+  # The problem is that it checks in order. [1, 2, 3], [4, 5, 6], [7, 8, 9], etc.
+  # It will ask "are there two_computer_markers for this line?"
+  # "Are there two_human_markers for this line?"
+  # It should instead check the entire board for an opportunity to win. Then check for opportunities to block.
+
+  def find_winning_opportunity(line)
+    if two_computer_markers?(line)
+      choose_empty_square(line)
     else
       nil
     end
   end
 
-  def two_consecutive_computer_markers?(line)
+  def find_blocking_opportunity(line)
+    if two_human_markers?(line)
+      choose_empty_square(line)
+    else
+      nil
+    end
+  end
+
+  def two_computer_markers?(line)
     line.count { |square| board.squares[square].marker == COMPUTER_MARKER } == 2
   end
 
-  def two_consecutive_human_markers?(line)
+  def two_human_markers?(line)
     line.count { |square| board.squares[square].marker == HUMAN_MARKER } == 2
   end
 
-  def choose_optimal_square(line)
+  def choose_empty_square(line)
     line.select { |square| board.squares[square].marker == " " }.first
   end
 
