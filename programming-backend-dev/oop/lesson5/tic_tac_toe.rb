@@ -14,6 +14,7 @@ class Board
     reset
   end
 
+  # rubocop:disable Metrics/AbcSize
   def draw
     puts "-------------"
     puts "| #{squares[1]} | #{squares[2]} | #{squares[3]} |"
@@ -23,6 +24,7 @@ class Board
     puts "| #{squares[7]} | #{squares[8]} | #{squares[9]} |"
     puts "-------------"
   end
+  # rubocop:enable Metrics/AbcSize
 
   def []=(num, marker)
     squares[num].marker = marker
@@ -130,7 +132,7 @@ class TTTGame
       if game_over?
         reset_score
         break unless play_again?
-     end
+      end
       reset
     end
 
@@ -228,63 +230,47 @@ class TTTGame
   end
 
   def computer_moves
-    # in order, do the following:
-    # check each line for an opportunity to win.
-    # check each line for an opportunity to block.
-    # pick square 5 if available.
-    # pick a random square.
-
-    square = nil
-    
-    Board::WINNING_LINES.each do |line|
-      square = find_winning_opportunity(line)
-      break if square
-    end
-
-    if !square
-      Board::WINNING_LINES.each do |line|
-        square = find_blocking_opportunity(line)
-        break if square
-      end
-    end
-
-    if !square && board.squares[5].unmarked?
-      square = 5
-    elsif !square && board.squares[5].marked?
-      square = board.unmarked_keys.sample
-    end
+    square = winning_move || blocking_move || center_square || random_square
 
     board[square] = COMPUTER_MARKER
   end
 
-  # right now, it is going through at risk squares, line by line. It will return the first at risk square.
-  # The problem is that it checks in order. [1, 2, 3], [4, 5, 6], [7, 8, 9], etc.
-  # It will ask "are there two_computer_markers for this line?"
-  # "Are there two_human_markers for this line?"
-  # It should instead check the entire board for an opportunity to win. Then check for opportunities to block.
+  def winning_move
+    winning_move = nil
 
-  def find_winning_opportunity(line)
-    if two_computer_markers?(line)
-      choose_empty_square(line)
-    else
-      nil
+    Board::WINNING_LINES.each do |line|
+      winning_move = find_best_move(line, COMPUTER_MARKER)
+      break if winning_move
     end
+
+    winning_move
   end
 
-  def find_blocking_opportunity(line)
-    if two_human_markers?(line)
-      choose_empty_square(line)
-    else
-      nil
+  def blocking_move
+    blocking_move = nil
+
+    Board::WINNING_LINES.each do |line|
+      blocking_move = find_best_move(line, HUMAN_MARKER)
+      break if blocking_move
     end
+
+    blocking_move
   end
 
-  def two_computer_markers?(line)
-    line.count { |square| board.squares[square].marker == COMPUTER_MARKER } == 2
+  def center_square
+    board.squares[5].unmarked? ? 5 : nil
   end
 
-  def two_human_markers?(line)
-    line.count { |square| board.squares[square].marker == HUMAN_MARKER } == 2
+  def random_square
+    board.unmarked_keys.sample
+  end
+
+  def find_best_move(line, player_marker)
+    choose_empty_square(line) if two_identical_markers?(line, player_marker)
+  end
+
+  def two_identical_markers?(line, player_marker)
+    line.count { |square| board.squares[square].marker == player_marker } == 2
   end
 
   def choose_empty_square(line)
